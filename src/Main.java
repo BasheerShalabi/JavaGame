@@ -64,5 +64,7 @@ public class Main {
         window.add(menuPanel);
 
         window.setVisible(true);
+
+        // ahmad was here
     }
 }
