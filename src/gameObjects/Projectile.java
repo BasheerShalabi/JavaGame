@@ -1,3 +1,7 @@
+package gameObjects;
+
+import main.GameConfig;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
@@ -15,7 +19,7 @@ public class Projectile {
         }
     }
 
-    public Rectangle self(){
+    public Rectangle hitBox(){
         return new Rectangle((int) projectile.x, (int) projectile.y, (int) projectile.width, (int) projectile.height);
     }
 
@@ -34,5 +38,9 @@ public class Projectile {
 
     public boolean isActive() {
         return this.active;
+    }
+
+    public int getDirection() {
+        return direction;
     }
 }

@@ -1,3 +1,8 @@
+package main;
+
+import gameObjects.Player;
+import gameObjects.Turret;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
@@ -8,7 +13,6 @@ public class GameEngine {
     private final Ellipse2D.Double[] coins;
     private final ArrayList<Turret> turrets;
 
-    private int groundLevel;
     private int verticalVelocity = 0;
 
     private boolean isJumping = false;
@@ -29,7 +33,6 @@ public class GameEngine {
         this.platforms = platforms;
         this.coins = coins;
         this.turrets = turrets;
-        this.groundLevel = 0;
     }
 
     //Getters Setters
@@ -43,11 +46,7 @@ public class GameEngine {
     public void setHit(boolean hit) {
         isHit = hit;
     }
-
-    public void setGroundLevel(int groundLevel) {
-        this.groundLevel = groundLevel;
-    }
-
+    
     public boolean isDoubleJumping() {
         return isDoubleJumping;
     }
@@ -91,12 +90,14 @@ public class GameEngine {
 
     // Handles player jumping logic, including double jump mechanics
     public void jump() {
-        if (player.getPlayerY() >= groundLevel - player.getPlayerHeight() || isOnPlatform) {
+        if (player.getPlayerY() >= GameConfig.GROUND_LEVEL - player.getPlayerHeight() || isOnPlatform) {
             verticalVelocity = player.getjumpStrength();
             isJumping = true;
+            SoundManager.playClip(GameConfig.PLAYER_JUMP_SOUND);
         } else if (canDoubleJump && !isDoubleJumping) {
             verticalVelocity = player.getjumpStrength();
             isDoubleJumping = true;
+            SoundManager.playClip(GameConfig.PLAYER_DOUBLE_JUMP_SOUND);
         }
     }
 
@@ -112,13 +113,13 @@ public class GameEngine {
 
     // Handles game physics including gravity, platform collision, and boundaries
     private void applyPhysics() {
-        if (!isOnPlatform && player.getPlayerY() < groundLevel - player.getPlayerHeight()) {
+        if (!isOnPlatform && player.getPlayerY() < GameConfig.GROUND_LEVEL - player.getPlayerHeight()) {
             if (verticalVelocity > GameConfig.MAX_DOWN_ACCELERATION) {
                 verticalVelocity = GameConfig.MAX_DOWN_ACCELERATION;
             }
             verticalVelocity += GameConfig.GRAVITY;
         } else if (!isOnPlatform && !isJumping) {
-            player.setPlayerY(groundLevel - player.getPlayerHeight());
+            player.setPlayerY(GameConfig.GROUND_LEVEL - player.getPlayerHeight());
             verticalVelocity = 0;
         }
 
@@ -144,7 +145,7 @@ public class GameEngine {
             isJumping = false;
         }
 
-        if (isOnPlatform || player.getPlayerY() == groundLevel - player.getPlayerHeight()) {
+        if (isOnPlatform || player.getPlayerY() == GameConfig.GROUND_LEVEL - player.getPlayerHeight()) {
             isDoubleJumping = false;
         }
 
@@ -157,7 +158,7 @@ public class GameEngine {
             player.setPlayerX(1000 - player.getPlayerWidth());
         }
 
-        if (player.getPlayerY() > groundLevel) {
+        if (player.getPlayerY() > GameConfig.GROUND_LEVEL) {
             gameOver = true;
         }
     }
@@ -169,6 +170,7 @@ public class GameEngine {
             if (player.getPlayerRect().intersects(coins[i].x, coins[i].y, coins[i].width, coins[i].height)) {
                 player.setPlayerScore(player.getPlayerScore() + 1);
                 coins[i] = null;
+                SoundManager.playClip(GameConfig.COIN_COLLECT_SOUND);
             }
         }
     }
@@ -177,11 +179,12 @@ public class GameEngine {
     private void CheckProjectileCollisions(){
         for (Turret turret : turrets) {
             if (turret.getProjectile() == null) continue;
-            if (player.getPlayerRect().intersects(turret.getProjectile().self())) {
+            if (player.getPlayerRect().intersects(turret.getProjectile().hitBox())) {
                 this.isHit = true;
                 player.setPlayerHealth(player.getPlayerHealth() - 15);
                 turret.setNullProjectile();
                 turret.setNextFireTime(System.currentTimeMillis()+(long)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2);
+                SoundManager.playClip(GameConfig.PLAYER_HIT_SOUND);
             }
         }
     }
@@ -232,6 +235,7 @@ public class GameEngine {
                     platforms.add(new Rectangle((int) (Math.random() * GameConfig.PLATFORM_MAX_X) + GameConfig.PLATFORM_MIN_X, y, GameConfig.PLATFORM_WIDTH, GameConfig.PLATFORM_HEIGHT));
                 }
                 lastPlatformTime = currentTime;
+                SoundManager.playClip(GameConfig.PLATFORM_SWAP_SOUND);
             }
         }
     }

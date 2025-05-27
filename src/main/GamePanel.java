@@ -1,3 +1,8 @@
+package main;
+
+import gameObjects.Player;
+import gameObjects.Turret;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -5,9 +10,6 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
-    //Initialize Constants
-    private int GROUND_LEVEL; //is a constant but gets initialized on game start, otherwise the game breaks
-    
     //Initialize Objects
     private Thread gameThread;
     private Player player;
@@ -68,6 +70,12 @@ public class GamePanel extends JPanel implements Runnable {
         //Initialize renderer
         renderer = new GameRenderer();
 
+        SoundManager.preloadSound(GameConfig.COIN_COLLECT_SOUND);
+        SoundManager.preloadSound(GameConfig.PLAYER_HIT_SOUND);
+        SoundManager.preloadSound(GameConfig.PLAYER_JUMP_SOUND);
+        SoundManager.preloadSound(GameConfig.PLAYER_DOUBLE_JUMP_SOUND);
+        SoundManager.preloadSound(GameConfig.PLATFORM_SWAP_SOUND);
+
         //Start thread
         gameThread.start();
     }
@@ -80,14 +88,10 @@ public class GamePanel extends JPanel implements Runnable {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+                throw new RuntimeException(e);
             }
         }
 
-        //Set ground level
-        GROUND_LEVEL = getHeight() - GameConfig.GROUND_OFFSET;
-        engine.setGroundLevel(GROUND_LEVEL);
 
         //The infinite game loop! (until you lose ofc)
         //Updates 60 times a second
@@ -97,7 +101,7 @@ public class GamePanel extends JPanel implements Runnable {
             try{
                 Thread.sleep(GameConfig.FRAME_TIME);
             }catch(InterruptedException e){
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
@@ -186,7 +190,7 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         //Render graphics
-        renderer.render(g, engine, engine.getPlayer(), platforms, coins, devMode, gameOver, GROUND_LEVEL, this);
+        renderer.render(g, engine, engine.getPlayer(), platforms, coins, devMode, gameOver, GameConfig.GROUND_LEVEL, this);
     }
 
 }

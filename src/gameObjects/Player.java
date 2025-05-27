@@ -1,3 +1,7 @@
+package gameObjects;
+
+import main.GameConfig;
+
 import java.awt.*;
 
 public class Player {
@@ -25,15 +29,6 @@ public class Player {
     public void moveRight() {
         this.playerX += playerSpeed;
         this.playerRect.x = this.playerX;
-    }
-
-    public void jump() {
-        this.playerY += jumpStrength;
-        this.playerRect.y = this.playerY;
-    }
-
-    public void loseHealth(int damage) {
-        this.playerHealth -= damage;
     }
 
     public int getPlayerX() {
@@ -72,10 +67,6 @@ public class Player {
 
     public void setPlayerSpeed(int playerSpeed) {
         this.playerSpeed = playerSpeed;
-    }
-
-    public int getPlayerSpeed() {
-        return playerSpeed;
     }
 
     public int getjumpStrength() {

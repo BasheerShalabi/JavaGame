@@ -1,7 +1,10 @@
+package gameObjects;
+
+import main.GameConfig;
+
 import java.util.Random;
 
 public class Turret {
-
     private final int x, y;
     private Projectile currentProjectile = null;
     private long nextFireTime = 0;

@@ -1,3 +1,8 @@
+package main;
+
+import gameObjects.Player;
+import gameObjects.Turret;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
@@ -10,13 +15,13 @@ public class GameRenderer {
         // Cast to Graphics2D for better control
         Graphics2D g2d = (Graphics2D) g;
 
-        // Clear background
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, panel.getWidth(), panel.getHeight());
+        // Draw background
+
+        g2d.drawImage(GameConfig.BACKGROUND_IMAGE,0, 0,null);
 
         // Draw ground
-        g2d.setColor(Color.WHITE);
-        g2d.drawLine(0, groundLevel, panel.getWidth(), groundLevel);
+
+        g2d.drawImage(GameConfig.GROUND_IMAGE,0, groundLevel, panel.getWidth(), panel.getHeight()-groundLevel,null);
 
         if(timer>0 && engine.isHit()){
             timer--;
@@ -35,7 +40,7 @@ public class GameRenderer {
         // Draw platforms
         g2d.setColor(Color.GRAY);
         for (Rectangle platform : platforms) {
-            g2d.fill(platform);
+            g2d.drawImage(GameConfig.PLATFORM_IMAGE, platform.x, platform.y, platform.width, platform.height, null);
         }
 
         // Draw coins
@@ -50,7 +55,11 @@ public class GameRenderer {
         g2d.setColor(Color.RED);
         for(Turret turret : engine.getTurrets()) {
             if (turret.getProjectile() != null) {
-                g2d.fill(new Ellipse2D.Double(turret.getProjectile().getX(), turret.getProjectile().getY(), GameConfig.PROJECTILE_WIDTH, GameConfig.PROJECTILE_HEIGHT));
+                if(turret.getProjectile().getDirection()>0){
+                    g2d.drawImage(GameConfig.PROJECTILE_ROTATED,(int)turret.getProjectile().getX(),(int)turret.getProjectile().getY(), GameConfig.PROJECTILE_WIDTH*2, GameConfig.PROJECTILE_HEIGHT,null);
+                }else {
+                    g2d.drawImage(GameConfig.PROJECTILE,(int)turret.getProjectile().getX(),(int)turret.getProjectile().getY(), GameConfig.PROJECTILE_WIDTH*2, GameConfig.PROJECTILE_HEIGHT,null);
+                }
             }
         }
 
@@ -61,7 +70,7 @@ public class GameRenderer {
         // Draw health
         g2d.drawString("Health: " + player.getPlayerHealth(), 50, 80);
 
-        // Game over message
+        // Show the Game over message
         if (gameOver) {
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 30));

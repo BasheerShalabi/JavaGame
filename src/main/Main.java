@@ -1,10 +1,12 @@
+package main;
+
 import javax.swing.*;
 import java.awt.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         //define a new window
         JFrame window = new JFrame();
 
@@ -15,7 +17,8 @@ public class Main {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
 
-        // Create menu panel with layout
+
+        // Create a menu panel with layout
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridBagLayout());
         menuPanel.setBackground(Color.BLACK);
@@ -47,7 +50,7 @@ public class Main {
         menuPanel.add(exitButton, gbc);
 
         // Add action listeners
-        startButton.addActionListener(e -> {
+        startButton.addActionListener(e ->  {
             window.remove(menuPanel);
             GamePanel panel = new GamePanel();
             window.add(panel);
@@ -55,12 +58,17 @@ public class Main {
             window.repaint();
             window.setFocusable(false);
             window.setFocusable(true);
+            try {
+                Class.forName("main.GameConfig");
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
             panel.requestFocus();
         });
 
         exitButton.addActionListener(e -> System.exit(0));
 
-        // Add menu panel to window
+        // Add a menu panel to the window
         window.add(menuPanel);
 
         window.setVisible(true);
