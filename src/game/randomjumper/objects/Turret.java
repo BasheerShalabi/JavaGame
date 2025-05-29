@@ -1,6 +1,6 @@
-package gameObjects;
+package game.randomjumper.objects;
 
-import main.GameConfig;
+import game.randomjumper.config.GameConfig;
 
 import java.util.Random;
 
@@ -37,7 +37,6 @@ public class Turret {
             scheduleNextFire();
         }
 
-
         // Try to fire if no active projectile and cooldown passed
         if (currentProjectile == null && currentTimeMillis >= nextFireTime) {
             fire();
@@ -50,7 +49,7 @@ public class Turret {
     }
 
     private void fire() {
-        currentProjectile = new Projectile(x, y-(GameConfig.COIN_OFFSET_Y/2));
+        currentProjectile = new Projectile(x, y-(GameConfig.NUT_OFFSET_Y /2));
     }
 
     private void scheduleNextFire() {

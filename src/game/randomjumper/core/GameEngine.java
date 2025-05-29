@@ -1,7 +1,9 @@
-package main;
+package game.randomjumper.core;
 
-import gameObjects.Player;
-import gameObjects.Turret;
+import game.randomjumper.config.GameConfig;
+import game.randomjumper.objects.Player;
+import game.randomjumper.objects.Turret;
+import game.randomjumper.managers.audio.SoundManager;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -10,11 +12,12 @@ import java.util.ArrayList;
 public class GameEngine {
     private final Player player;
     private final ArrayList<Rectangle> platforms;
-    private final Ellipse2D.Double[] coins;
+    private final Ellipse2D.Double[] nuts;
     private final ArrayList<Turret> turrets;
 
     private int verticalVelocity = 0;
 
+    private boolean isMoving=false;
     private boolean isJumping = false;
     private boolean isOnPlatform = false;
     private boolean isFalling = false;
@@ -23,15 +26,17 @@ public class GameEngine {
     private boolean gameOver = false;
     private boolean canRandomizePlatforms = false;
     private boolean isHit = false;
+    private boolean hasSetAnimation = false;
 
-    private long lastCoinTime = System.currentTimeMillis();
+    private long lastnutTime = System.currentTimeMillis();
     private long lastPlatformTime = System.currentTimeMillis();
+    private int timer = 15;
 
     //Constructor
-    public GameEngine(Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] coins, ArrayList<Turret> turrets) {
+    public GameEngine(Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] nuts, ArrayList<Turret> turrets) {
         this.player = player;
         this.platforms = platforms;
-        this.coins = coins;
+        this.nuts = nuts;
         this.turrets = turrets;
     }
 
@@ -49,6 +54,10 @@ public class GameEngine {
     
     public boolean isDoubleJumping() {
         return isDoubleJumping;
+    }
+
+    public void setMoving(boolean moving){
+        isMoving=moving;
     }
 
     public boolean isFalling() {
@@ -70,12 +79,15 @@ public class GameEngine {
     //Update
     public void update() {
         applyPhysics();
-        checkCoinCollisions();
-        spawnCoins();
+        checkNutCollisions();
+        spawnNuts();
         checkPowerUps();
         updateTurrets();
         CheckProjectileCollisions();
         randomizePlatforms();
+        checkPlayerState();
+        player.update();
+        updateIsHit();
 
         if(player.getPlayerHealth()<=0){
             gameOver=true;
@@ -93,11 +105,11 @@ public class GameEngine {
         if (player.getPlayerY() >= GameConfig.GROUND_LEVEL - player.getPlayerHeight() || isOnPlatform) {
             verticalVelocity = player.getjumpStrength();
             isJumping = true;
-            SoundManager.playClip(GameConfig.PLAYER_JUMP_SOUND);
+            SoundManager.playClip("jump");
         } else if (canDoubleJump && !isDoubleJumping) {
             verticalVelocity = player.getjumpStrength();
             isDoubleJumping = true;
-            SoundManager.playClip(GameConfig.PLAYER_DOUBLE_JUMP_SOUND);
+            SoundManager.playClip("doublejump");
         }
     }
 
@@ -163,14 +175,36 @@ public class GameEngine {
         }
     }
 
-    // Checks for collisions between player and coins, updates score accordingly
-    private void checkCoinCollisions() {
-        for (int i = 0; i < coins.length; i++) {
-            if (coins[i] == null) continue;
-            if (player.getPlayerRect().intersects(coins[i].x, coins[i].y, coins[i].width, coins[i].height)) {
+    private void updateIsHit(){
+        if(timer>0 && isHit){
+            timer--;
+        }else{
+            timer=20;
+            setHit(false);
+        }
+    }
+
+    private void checkPlayerState(){
+        if(isHit){
+            player.setState("hurt");
+        }else
+        if (isJumping || isDoubleJumping || isFalling) {
+            player.setState("jump");
+        } else if (isMoving) {
+            player.setState("run");
+        } else {
+            player.setState("idle");
+        }
+    }
+
+    // Checks for collisions between player and nuts, updates score accordingly
+    private void checkNutCollisions() {
+        for (int i = 0; i < nuts.length; i++) {
+            if (nuts[i] == null) continue;
+            if (player.getPlayerRect().intersects(nuts[i].x, nuts[i].y, nuts[i].width, nuts[i].height)) {
                 player.setPlayerScore(player.getPlayerScore() + 1);
-                coins[i] = null;
-                SoundManager.playClip(GameConfig.COIN_COLLECT_SOUND);
+                nuts[i] = null;
+                SoundManager.playClip("nut");
             }
         }
     }
@@ -184,20 +218,33 @@ public class GameEngine {
                 player.setPlayerHealth(player.getPlayerHealth() - 15);
                 turret.setNullProjectile();
                 turret.setNextFireTime(System.currentTimeMillis()+(long)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2);
-                SoundManager.playClip(GameConfig.PLAYER_HIT_SOUND);
+                SoundManager.playClip("hit");
             }
         }
     }
 
-    // Spawns new coins on platforms at regular intervals
-    private void spawnCoins() {
-        int i = (int) (Math.random() * coins.length);
-        if (coins[i] == null) {
+    // Spawns new nuts on platforms at regular intervals
+    private void spawnNuts() {
+        boolean hasEmptySlot = false;
+        for (Ellipse2D nut : nuts) {
+            if (nut == null) {
+                hasEmptySlot = true;
+                break;
+            }
+        }
+
+        if (!hasEmptySlot) {
+            lastnutTime = System.currentTimeMillis();
+            return;
+        }
+
+        int i = (int) (Math.random() * nuts.length);
+        if (nuts[i] == null) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastCoinTime >= GameConfig.COIN_SPAWN_DELAY) {
-                coins[i] = new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.COIN_OFFSET_X,
-                        platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.COIN_OFFSET_Y, GameConfig.COIN_SIZE, GameConfig.COIN_SIZE);
-                lastCoinTime = currentTime;
+            if (currentTime - lastnutTime >= GameConfig.NUT_SPAWN_DELAY) {
+                nuts[i] = new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X,
+                        platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE);
+                lastnutTime = currentTime;
             }
         }
     }
@@ -206,6 +253,10 @@ public class GameEngine {
     private void checkPowerUps() {
         if (player.getPlayerScore() >= GameConfig.POWER_UP_SPEED_SCORE) {
             player.setPlayerSpeed(GameConfig.POWER_UP_SPEED);
+            if (!hasSetAnimation) {
+                hasSetAnimation = true;
+                player.setAnimation("run", GameConfig.PLAYER_ANIMATION_INTERVAL_POWER_UP, GameConfig.PLAYER_RUN_ANIMATION_FRAME_COUNT);
+            }
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_JUMP_SCORE) {
             player.setJumpStrength(GameConfig.POWER_UP_JUMP_STRENGTH);
@@ -235,7 +286,7 @@ public class GameEngine {
                     platforms.add(new Rectangle((int) (Math.random() * GameConfig.PLATFORM_MAX_X) + GameConfig.PLATFORM_MIN_X, y, GameConfig.PLATFORM_WIDTH, GameConfig.PLATFORM_HEIGHT));
                 }
                 lastPlatformTime = currentTime;
-                SoundManager.playClip(GameConfig.PLATFORM_SWAP_SOUND);
+                SoundManager.playClip("platform-swap");
             }
         }
     }

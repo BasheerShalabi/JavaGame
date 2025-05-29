@@ -1,4 +1,4 @@
-package main;
+package game.randomjumper.managers.audio;
 
 import javax.sound.sampled.*;
 import java.io.*;
@@ -21,7 +21,15 @@ public class SoundManager {
 
     private static final Map<String, AudioData> audioCache = new HashMap<>();
 
-    public static void preloadSound(String path) {
+    public static void preloadSounds() {
+        preloadSound("nut","resources/sound/nut.wav");
+        preloadSound("hit","resources/sound/hit.wav");
+        preloadSound("jump","resources/sound/jump.wav");
+        preloadSound("doublejump","resources/sound/doublejump.wav");
+        preloadSound("platform-swap","resources/sound/platform-swap.wav");
+    }
+
+    public static void preloadSound(String key ,String path) {
         try {
             File file = new File(path);
             AudioInputStream ais = AudioSystem.getAudioInputStream(file);
@@ -29,17 +37,22 @@ public class SoundManager {
             long frameLength = ais.getFrameLength();
             byte[] bytes = ais.readAllBytes(); 
             ais.close();
-
-            audioCache.put(path, new AudioData(bytes, format, frameLength));
+            Clip warmup = AudioSystem.getClip();
+            warmup.open(format, bytes, 0, bytes.length);
+            warmup.start();
+            warmup.stop();
+            warmup.flush();
+            warmup.close();
+            audioCache.put(key, new AudioData(bytes, format, frameLength));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("Failed to load sound: " + path);
         }
     }
 
-    public static void playClip(String path) {
-        AudioData audioData = audioCache.get(path);
+    public static void playClip(String key) {
+        AudioData audioData = audioCache.get(key);
         if (audioData == null) {
-            System.err.println("Sound not preloaded: " + path);
+            System.err.println("Sound not preloaded: " + key);
             return;
         }
 

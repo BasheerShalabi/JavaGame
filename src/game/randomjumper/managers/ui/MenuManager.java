@@ -1,14 +1,23 @@
-package main;
+package game.randomjumper.managers.ui;
+
+import game.randomjumper.config.GameConfig;
+import game.randomjumper.core.GamePanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args)  {
-        //define a new window
-        JFrame window = new JFrame();
+public class MenuManager {
+    private static final JFrame window = new JFrame();
+    private static final JPanel menuPanel = new JPanel();
+    private static final JButton startButton = new JButton("Start Game");
+    private static final JButton exitButton = new JButton("Exit");
+    private static final Dimension buttonSize = new Dimension(200, 50);
+    private static final GridBagConstraints gbc = new GridBagConstraints();
+    private static final GamePanel panel = new GamePanel();
+
+
+    public static void startGame() {
+
 
         //set window parameters and settings
         window.setTitle("Random Platformer");
@@ -19,16 +28,12 @@ public class Main {
 
 
         // Create a menu panel with layout
-        JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridBagLayout());
         menuPanel.setBackground(Color.BLACK);
 
         // Create buttons with styling
-        JButton startButton = new JButton("Start Game");
-        JButton exitButton = new JButton("Exit");
 
         // Style buttons
-        Dimension buttonSize = new Dimension(200, 50);
         startButton.setPreferredSize(buttonSize);
         exitButton.setPreferredSize(buttonSize);
 
@@ -40,7 +45,6 @@ public class Main {
         exitButton.setFocusPainted(false);
 
         // Layout constraints
-        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(10, 0, 10, 0);
@@ -52,17 +56,11 @@ public class Main {
         // Add action listeners
         startButton.addActionListener(e ->  {
             window.remove(menuPanel);
-            GamePanel panel = new GamePanel();
             window.add(panel);
             window.revalidate();
             window.repaint();
             window.setFocusable(false);
             window.setFocusable(true);
-            try {
-                Class.forName("main.GameConfig");
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
             panel.requestFocus();
         });
 
@@ -73,6 +71,5 @@ public class Main {
 
         window.setVisible(true);
 
-        // ahmad was here
     }
 }
