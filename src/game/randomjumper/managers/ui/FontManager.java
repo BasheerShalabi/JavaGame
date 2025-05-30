@@ -4,12 +4,14 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class FontManager {
 
     public static void loadFont() {
         try {
-            File fontFile = new File("resources/fonts/joystix monospace.otf");
+            InputStream fontFile = FontManager.class.getResourceAsStream("/fonts/joystix monospace.otf");
+            assert fontFile != null;
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();

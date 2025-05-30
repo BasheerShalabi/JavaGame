@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class ImageManager {
@@ -15,10 +16,10 @@ public class ImageManager {
     private static final HashMap<String, BufferedImage> images = new HashMap<>();
 
     public static void preLoadImages() {
-        preLoadImage("coin", "resources/images/nut.png" );
-        preLoadImage("platform" , "resources/images/platform.png" );
-        preLoadImage("ground", "resources/images/ground.png" );
-        preLoadImage("background", "resources/images/background.png" );
+        preLoadImage("coin", "/images/nut.png" );
+        preLoadImage("platform" , "/images/platform.png" );
+        preLoadImage("ground", "/images/ground.png" );
+        preLoadImage("background", "/images/background.png" );
         loadPlayerSprites();
         loadProjectileSprites();
         // add all other images here
@@ -56,7 +57,7 @@ public class ImageManager {
         for (int i = 0; i < animations.length; i++) {
             for (int j = 0; j < frameCounts[i]; j++) {
                 String key = "player/" + animations[i] + "-" + j;
-                String path = "resources/images/player/" + "player-" + animations[i] + "-" + (j+1) + ".png";
+                String path = "/images/player/" + "player-" + animations[i] + "-" + (j+1) + ".png";
                 preLoadImage(key, path);
             }
         }
@@ -69,7 +70,7 @@ public class ImageManager {
         for (int i = 0; i < animations.length; i++) {
             for (int j = 0; j < frameCounts[i]; j++) {
                 String key =  animations[i] + "-" + j;
-                String path = "resources/images/projectile/" + animations[i] + "-" + (j+1) + ".png";
+                String path = "/images/projectile/" + animations[i] + "-" + (j+1) + ".png";
                 preLoadImage(key, path);
             }
         }
@@ -78,7 +79,8 @@ public class ImageManager {
 
     private static void preLoadImage(String key, String path) {
         try {
-            File file = new File(path);
+            InputStream file = ImageManager.class.getResourceAsStream(path);
+            assert file != null;
             BufferedImage img = ImageIO.read(file);
             warmUpImage(img);
             images.put(key, img);

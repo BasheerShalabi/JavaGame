@@ -2,6 +2,7 @@ package game.randomjumper.managers.audio;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,16 +23,17 @@ public class SoundManager {
     private static final Map<String, AudioData> audioCache = new HashMap<>();
 
     public static void preloadSounds() {
-        preloadSound("nut","resources/sounds/nut.wav");
-        preloadSound("hit","resources/sounds/hit.wav");
-        preloadSound("jump","resources/sounds/jump.wav");
-        preloadSound("doublejump","resources/sounds/doublejump.wav");
-        preloadSound("platform-swap","resources/sounds/platform-swap.wav");
+        preloadSound("nut","/sounds/nut.wav");
+        preloadSound("hit","/sounds/hit.wav");
+        preloadSound("jump","/sounds/jump.wav");
+        preloadSound("doublejump","/sounds/doublejump.wav");
+        preloadSound("platform-swap","/sounds/platform-swap.wav");
     }
 
     public static void preloadSound(String key ,String path) {
         try {
-            File file = new File(path);
+            URL file = SoundManager.class.getResource(path);
+            assert file != null;
             AudioInputStream ais = AudioSystem.getAudioInputStream(file);
             AudioFormat format = ais.getFormat();
             long frameLength = ais.getFrameLength();
