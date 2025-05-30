@@ -22,11 +22,11 @@ public class SoundManager {
     private static final Map<String, AudioData> audioCache = new HashMap<>();
 
     public static void preloadSounds() {
-        preloadSound("nut","resources/sound/nut.wav");
-        preloadSound("hit","resources/sound/hit.wav");
-        preloadSound("jump","resources/sound/jump.wav");
-        preloadSound("doublejump","resources/sound/doublejump.wav");
-        preloadSound("platform-swap","resources/sound/platform-swap.wav");
+        preloadSound("nut","resources/sounds/nut.wav");
+        preloadSound("hit","resources/sounds/hit.wav");
+        preloadSound("jump","resources/sounds/jump.wav");
+        preloadSound("doublejump","resources/sounds/doublejump.wav");
+        preloadSound("platform-swap","resources/sounds/platform-swap.wav");
     }
 
     public static void preloadSound(String key ,String path) {
