@@ -28,6 +28,7 @@ public class SoundManager {
         preloadSound("jump","/sounds/jump.wav");
         preloadSound("doublejump","/sounds/doublejump.wav");
         preloadSound("platform-swap","/sounds/platform-swap.wav");
+        preloadSound("powerup","/sounds/powerup.wav");
     }
 
     public static void preloadSound(String key ,String path) {

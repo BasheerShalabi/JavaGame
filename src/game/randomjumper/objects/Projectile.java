@@ -54,7 +54,9 @@ public class Projectile extends Animatable {
         BufferedImage frame = animations.get(currentState).getCurrentFrame();
         if(direction == 1){
             frame = ImageManager.flipOverY(frame);
+            g.drawImage(frame,(int)(projectile.x-(projectile.width)),(int)(projectile.y-(projectile.height/2)),GameConfig.PLAYER_WIDTH,GameConfig.PLAYER_HEIGHT/2,null);
+            return;
         }
-        g.drawImage(frame,(int)projectile.x,(int)projectile.y,GameConfig.PLAYER_WIDTH,GameConfig.PLAYER_HEIGHT/2,null);
+        g.drawImage(frame,(int)(projectile.x),(int)(projectile.y-(projectile.height/2)),GameConfig.PLAYER_WIDTH,GameConfig.PLAYER_HEIGHT/2,null);
     }
 }

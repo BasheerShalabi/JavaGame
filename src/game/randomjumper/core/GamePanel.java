@@ -14,14 +14,12 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
-    //Initialize Objects
-    private Thread gameThread;
     private Player player;
-    private ArrayList<Rectangle> platforms = new ArrayList<>();
+    private final ArrayList<Rectangle> platforms = new ArrayList<>();
     private Ellipse2D.Double[] nuts;
     private GameEngine engine;
     private GameRenderer renderer;
-    private ArrayList<Turret> turrets = new ArrayList<>();
+    private final ArrayList<Turret> turrets = new ArrayList<>();
     
     //Initialize Toggles
     private boolean devMode = false;
@@ -55,7 +53,8 @@ public class GamePanel extends JPanel implements Runnable {
         FontManager.loadFont();
 
         //Initialize thread and player game.randomjumper.objects
-        gameThread = new Thread(this);
+        //Initialize Objects
+        Thread gameThread = new Thread(this);
         player = new Player(GameConfig.INITIAL_PLAYER_X, GameConfig.INITIAL_PLAYER_Y);
 
         //Initialize platforms with random horizontal values
@@ -84,16 +83,6 @@ public class GamePanel extends JPanel implements Runnable {
     //This method executes when the thread starts, this is called the Game Loop
     @Override
     public void run(){
-        // Wait for the components to Initialize before starting the game
-        while (getWidth() == 0 || getHeight() == 0 || !isVisible()) {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-
         //The infinite game loop! (until you lose ofc)
         //Updates 60 times a second
         while(!gameOver){
@@ -105,6 +94,7 @@ public class GamePanel extends JPanel implements Runnable {
                 throw new RuntimeException(e);
             }
         }
+
     }
 
     //a method to check for intersection between 2 rectangles (not my doing, edit at your own risk!)
@@ -160,6 +150,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     //Method to handle key down events
     private void handleKeyPress(KeyEvent e){
+        if(gameOver) return;
         int key = e.getKeyCode();
 
         //Left and Right arrows

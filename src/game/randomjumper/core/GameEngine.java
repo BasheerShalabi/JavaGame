@@ -28,7 +28,7 @@ public class GameEngine {
     private boolean isHit = false;
     private boolean hasSetAnimation = false;
 
-    private long lastnutTime = System.currentTimeMillis();
+    private long lastNutTime = System.currentTimeMillis();
     private long lastPlatformTime = System.currentTimeMillis();
     private int timer = 15;
 
@@ -234,17 +234,17 @@ public class GameEngine {
         }
 
         if (!hasEmptySlot) {
-            lastnutTime = System.currentTimeMillis();
+            lastNutTime = System.currentTimeMillis();
             return;
         }
 
         int i = (int) (Math.random() * nuts.length);
         if (nuts[i] == null) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastnutTime >= GameConfig.NUT_SPAWN_DELAY) {
+            if (currentTime - lastNutTime >= GameConfig.NUT_SPAWN_DELAY) {
                 nuts[i] = new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X,
                         platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE);
-                lastnutTime = currentTime;
+                lastNutTime = currentTime;
             }
         }
     }
@@ -257,12 +257,15 @@ public class GameEngine {
                 hasSetAnimation = true;
                 player.setAnimation("run", GameConfig.PLAYER_ANIMATION_INTERVAL_POWER_UP, GameConfig.PLAYER_RUN_ANIMATION_FRAME_COUNT);
             }
+            GameRenderer.setPowerUp("speed-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_JUMP_SCORE) {
             player.setJumpStrength(GameConfig.POWER_UP_JUMP_STRENGTH);
+            GameRenderer.setPowerUp("jump-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_DOUBLE_JUMP_SCORE) {
             canDoubleJump = true;
+            GameRenderer.setPowerUp("double-jump-boost");
         }
         if(player.getPlayerScore() >= GameConfig.PENALTY_RANDOM_PLATFORMS){
             canRandomizePlatforms=true;

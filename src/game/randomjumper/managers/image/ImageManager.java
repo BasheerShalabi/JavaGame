@@ -20,6 +20,9 @@ public class ImageManager {
         preLoadImage("platform" , "/images/platform.png" );
         preLoadImage("ground", "/images/ground.png" );
         preLoadImage("background", "/images/background.png" );
+        preLoadImage("speed-boost", "/images/speed-boost.png" );
+        preLoadImage("jump-boost", "/images/jump-boost.png" );
+        preLoadImage("double-jump-boost", "/images/double-jump-boost.png" );
         loadPlayerSprites();
         loadProjectileSprites();
         // add all other images here
