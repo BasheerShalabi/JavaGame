@@ -17,8 +17,6 @@ public class FontManager {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(customFont);
 
-            System.out.println("Font loaded successfully: " + customFont.getFontName());
-
         } catch (IOException | java.awt.FontFormatException e) {
             System.err.println("Error loading font: " + e.getMessage());
         }

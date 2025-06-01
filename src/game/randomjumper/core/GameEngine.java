@@ -14,6 +14,7 @@ public class GameEngine {
     private final ArrayList<Rectangle> platforms;
     private final Ellipse2D.Double[] nuts;
     private final ArrayList<Turret> turrets;
+    private final GameRenderer renderer;
 
     private int verticalVelocity = 0;
 
@@ -33,11 +34,12 @@ public class GameEngine {
     private int timer = 15;
 
     //Constructor
-    public GameEngine(Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] nuts, ArrayList<Turret> turrets) {
+    public GameEngine(Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] nuts, ArrayList<Turret> turrets,GameRenderer renderer) {
         this.player = player;
         this.platforms = platforms;
         this.nuts = nuts;
         this.turrets = turrets;
+        this.renderer = renderer;
     }
 
     //Getters Setters
@@ -257,15 +259,15 @@ public class GameEngine {
                 hasSetAnimation = true;
                 player.setAnimation("run", GameConfig.PLAYER_ANIMATION_INTERVAL_POWER_UP, GameConfig.PLAYER_RUN_ANIMATION_FRAME_COUNT);
             }
-            GameRenderer.setPowerUp("speed-boost");
+            renderer.setPowerUp("speed-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_JUMP_SCORE) {
             player.setJumpStrength(GameConfig.POWER_UP_JUMP_STRENGTH);
-            GameRenderer.setPowerUp("jump-boost");
+            renderer.setPowerUp("jump-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_DOUBLE_JUMP_SCORE) {
             canDoubleJump = true;
-            GameRenderer.setPowerUp("double-jump-boost");
+            renderer.setPowerUp("double-jump-boost");
         }
         if(player.getPlayerScore() >= GameConfig.PENALTY_RANDOM_PLATFORMS){
             canRandomizePlatforms=true;

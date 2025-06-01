@@ -2,6 +2,7 @@ package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
 import game.randomjumper.managers.ui.FontManager;
+import game.randomjumper.managers.ui.MenuManager;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.audio.SoundManager;
@@ -19,6 +20,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Ellipse2D.Double[] nuts;
     private GameEngine engine;
     private GameRenderer renderer;
+    private Thread gameThread;
     private final ArrayList<Turret> turrets = new ArrayList<>();
     
     //Initialize Toggles
@@ -42,9 +44,10 @@ public class GamePanel extends JPanel implements Runnable {
                 handleKeyRelease(e);
             }
         });
-        
+
         startGame();
     }
+
 
     //Initialize Game Objects and start a thread
     private void startGame(){
@@ -52,9 +55,8 @@ public class GamePanel extends JPanel implements Runnable {
         ImageManager.preLoadImages();
         FontManager.loadFont();
 
-        //Initialize thread and player game.randomjumper.objects
         //Initialize Objects
-        Thread gameThread = new Thread(this);
+        gameThread = new Thread(this);
         player = new Player(GameConfig.INITIAL_PLAYER_X, GameConfig.INITIAL_PLAYER_Y);
 
         //Initialize platforms with random horizontal values
@@ -70,14 +72,20 @@ public class GamePanel extends JPanel implements Runnable {
         //Initialize coin array
         nuts = new Ellipse2D.Double[platforms.size()];
 
-        //Initialize the game engine
-        engine = new GameEngine(player, platforms, nuts, turrets);
-
         //Initialize renderer
         renderer = new GameRenderer();
 
+        //Initialize the game engine
+        engine = new GameEngine(player, platforms, nuts, turrets,renderer);
+
         //Start thread
         gameThread.start();
+    }
+
+    public void stopGame() {
+        if (gameThread != null && gameThread.isAlive()) {
+            gameThread.interrupt();
+        }
     }
 
     //This method executes when the thread starts, this is called the Game Loop
@@ -85,16 +93,18 @@ public class GamePanel extends JPanel implements Runnable {
     public void run(){
         //The infinite game loop! (until you lose ofc)
         //Updates 60 times a second
-        while(!gameOver){
+        while(!gameOver && !Thread.currentThread().isInterrupted()){
             update();
             repaint();
             try{
                 Thread.sleep(GameConfig.FRAME_TIME);
             }catch(InterruptedException e){
-                throw new RuntimeException(e);
+                return;
             }
         }
-
+        SwingUtilities.invokeLater(() -> {
+            MenuManager.tryAgainMenu(this);
+        });
     }
 
     //a method to check for intersection between 2 rectangles (not my doing, edit at your own risk!)
@@ -194,5 +204,6 @@ public class GamePanel extends JPanel implements Runnable {
         //Render graphics
         renderer.render(g, engine, engine.getPlayer(), platforms, nuts, devMode, gameOver, GameConfig.GROUND_LEVEL, this);
     }
+
 
 }

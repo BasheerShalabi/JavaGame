@@ -13,10 +13,10 @@ import java.util.HashMap;
 
 public class GameRenderer {
 
-    private static final HashMap<String,Integer> powerUps = new HashMap<>();
-    private static int powerUpOffset=0;
+    private final HashMap<String,Integer> powerUps = new HashMap<>();
+    private int powerUpOffset=0;
 
-    public static void setPowerUp(String key){
+    public void setPowerUp(String key){
         if(!powerUps.containsKey(key)){
             powerUpOffset+=60;
             powerUps.put(key,powerUpOffset);
