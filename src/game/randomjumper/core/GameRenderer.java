@@ -1,7 +1,6 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.managers.audio.SoundManager;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.image.ImageManager;
@@ -9,22 +8,28 @@ import game.randomjumper.managers.image.ImageManager;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class GameRenderer {
 
-    private final HashMap<String,Integer> powerUps = new HashMap<>();
-    private int powerUpOffset=0;
+    private final Player player;
+    private final ArrayList<Rectangle> platforms;
+    private final ArrayList<Turret> turrets;
+    private final Ellipse2D.Double[] nuts;
+    private final GameEngine engine;
+    private boolean gameOver;
 
-    public void setPowerUp(String key){
-        if(!powerUps.containsKey(key)){
-            powerUpOffset+=60;
-            powerUps.put(key,powerUpOffset);
-            SoundManager.playClip("powerup");
-        }
+
+    public GameRenderer(GameContext instance){
+        this.player = instance.getPlayer();
+        this.platforms = instance.getPlatforms();
+        this.turrets = instance.getTurrets();
+        this.nuts = instance.getNuts();
+        this.gameOver = instance.isGameOver();
+        this.engine = instance.getEngine();
+
     }
 
-    public void render(Graphics g, GameEngine engine, Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] coins, boolean devMode, boolean gameOver, int groundLevel, GamePanel panel) {
+    public void render(Graphics g) {
         // Cast to Graphics2D for better control
         Graphics2D g2d = (Graphics2D) g;
 
@@ -34,7 +39,7 @@ public class GameRenderer {
 
         // Draw ground
 
-        g2d.drawImage(ImageManager.getImage("ground"),0, groundLevel, panel.getWidth(), panel.getHeight()-groundLevel,null);
+        g2d.drawImage(ImageManager.getImage("ground"),0, GameConfig.GROUND_LEVEL, GameConfig.SCREEN_WIDTH, GameConfig.SCREEN_HEIGHT-GameConfig.GROUND_LEVEL,null);
 
         // Draw player
         player.draw(g2d);
@@ -45,22 +50,22 @@ public class GameRenderer {
         }
 
         // Draw nuts
-        for (Ellipse2D.Double coin : coins) {
-            if (coin != null) {
-                g2d.drawImage(ImageManager.getImage("coin"),(int)(coin.x-(coin.width/3)),(int)(coin.y-(coin.height/3)),(int)(coin.width*1.5),(int)(coin.height*1.5),null);
+        for (Ellipse2D.Double nut : nuts) {
+            if (nut != null) {
+                g2d.drawImage(ImageManager.getImage("coin"),(int)(nut.x-(nut.width/3)),(int)(nut.y-(nut.height/3)),(int)(nut.width*1.5),(int)(nut.height*1.5),null);
             }
         }
 
         // Draw projectiles
-        for(Turret turret : engine.getTurrets()) {
+        for(Turret turret : turrets) {
             if (turret.getProjectile() != null) {
                 turret.getProjectile().draw(g2d);
             }
         }
 
         // Draw Power ups
-        powerUps.forEach((k,v) -> {
-            g2d.drawImage(ImageManager.getImage(k),panel.getWidth()-v,20,40,40,null);
+        engine.getPowerUps().forEach((k,v) -> {
+            g2d.drawImage(ImageManager.getImage(k),GameConfig.SCREEN_WIDTH-v,20,40,40,null);
         });
 
         g2d.setColor(new Color(0,0,0,.8f ));
@@ -75,21 +80,24 @@ public class GameRenderer {
 
         // Show the Game over message
         if (gameOver) {
+            g2d.setColor(new Color(0,0,0,.8f ));
+            g2d.fillRect((GameConfig.SCREEN_WIDTH/3)-10,(GameConfig.SCREEN_HEIGHT/3)-70,GameConfig.SCREEN_WIDTH/3,GameConfig.SCREEN_HEIGHT/3);
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("JoystixMonospace-Regular", Font.BOLD, 30));
-            g2d.drawString("GAME OVER", GameConfig.SCREEN_WIDTH / 2 - 150, GameConfig.SCREEN_HEIGHT / 2);
+            int width = g2d.getFontMetrics().stringWidth("GAME OVER");
+            g2d.drawString("GAME OVER", (GameConfig.SCREEN_WIDTH / 2)-(width/2)-5, GameConfig.SCREEN_HEIGHT / 2 - 150);
         }
 
         // Dev mode variables
-        if (devMode) {
+        if (engine.isDevMode()) {
             g2d.setColor(Color.WHITE);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString("X: "+player.getPlayerX(),50,panel.getHeight()-90);
-            g.drawString("Y: "+player.getPlayerY(),130,panel.getHeight()-90);
-            g.drawString("Jumping: "+engine.isJumping(),50,panel.getHeight()-140);
-            g.drawString("Vertical Velocity: "+engine.getVerticalVelocity(),50,panel.getHeight()-210);
-            g.drawString("Falling: "+engine.isFalling(),50,panel.getHeight()-280);
-            g.drawString("DoubleJumping: "+engine.isDoubleJumping(),50,panel.getHeight()-350);
+            g.drawString("X: "+player.getPlayerX(),50,GameConfig.SCREEN_HEIGHT-90);
+            g.drawString("Y: "+player.getPlayerY(),130,GameConfig.SCREEN_HEIGHT-90);
+            g.drawString("Jumping: "+engine.isJumping(),50,GameConfig.SCREEN_HEIGHT-140);
+            g.drawString("Vertical Velocity: "+engine.getVerticalVelocity(),50,GameConfig.SCREEN_HEIGHT-210);
+            g.drawString("Falling: "+engine.isFalling(),50,GameConfig.SCREEN_HEIGHT-280);
+            g.drawString("DoubleJumping: "+engine.isDoubleJumping(),50,GameConfig.SCREEN_HEIGHT-350);
 
             g2d.setColor(Color.RED);
 
@@ -101,14 +109,14 @@ public class GameRenderer {
             }
 
             // Draw nuts
-            for (Ellipse2D.Double coin : coins) {
-                if (coin != null) {
-                    g2d.drawRect((int)coin.x,(int)coin.y,(int)coin.width,(int)coin.height);
+            for (Ellipse2D.Double nut : nuts) {
+                if (nut != null) {
+                    g2d.drawRect((int)nut.x,(int)nut.y,(int)nut.width,(int)nut.height);
                 }
             }
 
             // Draw projectiles
-            for(Turret turret : engine.getTurrets()) {
+            for(Turret turret : turrets) {
                 if (turret.getProjectile() != null) {
                     g2d.drawRect((int)turret.getProjectile().getX(),(int)turret.getProjectile().getY(),GameConfig.PROJECTILE_WIDTH,GameConfig.PROJECTILE_HEIGHT);
                 }

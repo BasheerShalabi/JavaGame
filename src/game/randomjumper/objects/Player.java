@@ -16,14 +16,10 @@ public class Player extends Animatable {
 
     private int score = 0;
     private int playerHealth = GameConfig.PLAYER_HEALTH;
-    private int playerX;
-    private int playerY;
     private int direction = 1;
 
     public Player(int x, int y) {
         super("idle");
-        this.playerX = x;
-        this.playerY = y;
         this.playerRect = new Rectangle(x, y, GameConfig.PLAYER_WIDTH, GameConfig.PLAYER_HEIGHT);
 
         animations.put("idle", SpriteAnimation.loadAnimation("idle", GameConfig.PLAYER_IDLE_ANIMATION_FRAME_COUNT, GameConfig.PLAYER_ANIMATION_INTERVAL,"player/"));
@@ -33,8 +29,7 @@ public class Player extends Animatable {
     }
 
     public void moveLeft() {
-        this.playerX -= playerSpeed;
-        this.playerRect.x = this.playerX;
+        this.playerRect.x -= playerSpeed;
     }
 
     public void setDirection(int direction) {
@@ -42,25 +37,22 @@ public class Player extends Animatable {
     }
 
     public void moveRight() {
-        this.playerX += playerSpeed;
-        this.playerRect.x = this.playerX;
+        this.playerRect.x += playerSpeed;
     }
 
     public int getPlayerX() {
-        return playerX;
+        return playerRect.x;
     }
 
     public int getPlayerY() {
-        return playerY;
+        return playerRect.y;
     }
 
     public void setPlayerY(int playerY) {
-        this.playerY = playerY;
         this.playerRect.y = playerY;
     }
 
     public void setPlayerX(int playerX) {
-        this.playerX = playerX;
         this.playerRect.x = playerX;
     }
 
@@ -105,6 +97,8 @@ public class Player extends Animatable {
         BufferedImage frame = animations.get(currentState).getCurrentFrame();
         if(direction == 1){
             frame = ImageManager.flipOverY(frame);
+            g.drawImage(frame, playerRect.x-(int)(GameConfig.PLAYER_WIDTH/1.5), playerRect.y-(GameConfig.PLAYER_HEIGHT/5), null);
+            return;
         }
         g.drawImage(frame, playerRect.x-(GameConfig.PLAYER_WIDTH/2), playerRect.y-(GameConfig.PLAYER_HEIGHT/5), null);
     }

@@ -8,8 +8,10 @@ import game.randomjumper.managers.audio.SoundManager;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameEngine {
+    private final HashMap<String,Integer> powerUps = new HashMap<>();
     private final Player player;
     private final ArrayList<Rectangle> platforms;
     private final Ellipse2D.Double[] nuts;
@@ -17,6 +19,7 @@ public class GameEngine {
     private final GameRenderer renderer;
 
     private int verticalVelocity = 0;
+    private int powerUpOffset=0;
 
     private boolean isMoving=false;
     private boolean isJumping = false;
@@ -28,18 +31,27 @@ public class GameEngine {
     private boolean canRandomizePlatforms = false;
     private boolean isHit = false;
     private boolean hasSetAnimation = false;
+    private boolean devMode = false;
 
     private long lastNutTime = System.currentTimeMillis();
     private long lastPlatformTime = System.currentTimeMillis();
     private int timer = 15;
 
     //Constructor
-    public GameEngine(Player player, ArrayList<Rectangle> platforms, Ellipse2D.Double[] nuts, ArrayList<Turret> turrets,GameRenderer renderer) {
-        this.player = player;
-        this.platforms = platforms;
-        this.nuts = nuts;
-        this.turrets = turrets;
-        this.renderer = renderer;
+    public GameEngine(GameContext instance) {
+        player = instance.getPlayer();
+        platforms = instance.getPlatforms();
+        nuts = instance.getNuts();
+        turrets = instance.getTurrets();
+        renderer = instance.getRenderer();
+    }
+
+    public void setDevMode(){
+        devMode = !devMode;
+    }
+
+    public boolean isDevMode(){
+        return devMode;
     }
 
     //Getters Setters
@@ -53,7 +65,7 @@ public class GameEngine {
     public void setHit(boolean hit) {
         isHit = hit;
     }
-    
+
     public boolean isDoubleJumping() {
         return isDoubleJumping;
     }
@@ -70,13 +82,10 @@ public class GameEngine {
         return isJumping;
     }
 
-    public Player getPlayer() {
-        return player;
+    public HashMap<String,Integer> getPowerUps(){
+        return powerUps;
     }
 
-    public ArrayList<Turret> getTurrets() {
-        return turrets;
-    }
 
     //Update
     public void update() {
@@ -139,7 +148,7 @@ public class GameEngine {
 
         for (Rectangle platform : platforms) {
             if ((!isJumping && (!isDoubleJumping || isFalling))
-                    && GamePanel.doesTopIntersect(
+                    && doesTopIntersect(
                     player.getPlayerX(),
                     player.getPlayerY() + (player.getPlayerHeight() * 3 / 4),
                     player.getPlayerX() + player.getPlayerWidth(),
@@ -217,7 +226,7 @@ public class GameEngine {
             if (turret.getProjectile() == null) continue;
             if (player.getPlayerRect().intersects(turret.getProjectile().hitBox())) {
                 this.isHit = true;
-                player.setPlayerHealth(player.getPlayerHealth() - 15);
+                player.setPlayerHealth(player.getPlayerHealth() - GameConfig.PROJECTILE_DAMAGE);
                 turret.setNullProjectile();
                 turret.setNextFireTime(System.currentTimeMillis()+(long)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2);
                 SoundManager.playClip("hit");
@@ -259,15 +268,15 @@ public class GameEngine {
                 hasSetAnimation = true;
                 player.setAnimation("run", GameConfig.PLAYER_ANIMATION_INTERVAL_POWER_UP, GameConfig.PLAYER_RUN_ANIMATION_FRAME_COUNT);
             }
-            renderer.setPowerUp("speed-boost");
+            setPowerUp("speed-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_JUMP_SCORE) {
             player.setJumpStrength(GameConfig.POWER_UP_JUMP_STRENGTH);
-            renderer.setPowerUp("jump-boost");
+            setPowerUp("jump-boost");
         }
         if (player.getPlayerScore() >= GameConfig.POWER_UP_DOUBLE_JUMP_SCORE) {
             canDoubleJump = true;
-            renderer.setPowerUp("double-jump-boost");
+            setPowerUp("double-jump-boost");
         }
         if(player.getPlayerScore() >= GameConfig.PENALTY_RANDOM_PLATFORMS){
             canRandomizePlatforms=true;
@@ -294,5 +303,38 @@ public class GameEngine {
                 SoundManager.playClip("platform-swap");
             }
         }
+    }
+
+    public void setPowerUp(String key){
+        if(!powerUps.containsKey(key)){
+            powerUpOffset+=60;
+            powerUps.put(key,powerUpOffset);
+            SoundManager.playClip("powerup");
+        }
+    }
+
+    //a method to check for intersection between 2 rectangles (not my doing, edit at your own risk!)
+    public static boolean doesTopIntersect(
+            int ax1, int ay1, int ax2, int ay2,
+            int bx1, int by1, int bx2, int by2) {
+
+        // Normalize coordinates
+        int aLeft = Math.min(ax1, ax2);
+        int aRight = Math.max(ax1, ax2);
+        int aTop = Math.min(ay1, ay2);
+        int aBottom = Math.max(ay1, ay2);
+
+        int bLeft = Math.min(bx1, bx2);
+        int bRight = Math.max(bx1, bx2);
+        int bTop = Math.min(by1, by2);
+        int bBottom = Math.max(by1, by2);
+
+        // Check horizontal (x-axis) overlap
+        boolean horizontalOverlap = !(aRight < bLeft || aLeft > bRight);
+
+        // Check if the top of B intersects the bottom of A
+        boolean verticalTouch = bTop <= aBottom && bTop >= aTop;
+
+        return horizontalOverlap && verticalTouch;
     }
 }

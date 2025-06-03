@@ -2,7 +2,6 @@ package game.randomjumper.managers.ui;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 

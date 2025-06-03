@@ -1,6 +1,7 @@
 package game.randomjumper.managers.ui;
 
 import game.randomjumper.config.GameConfig;
+import game.randomjumper.core.GameInstance;
 import game.randomjumper.core.GamePanel;
 
 import javax.swing.*;
@@ -8,7 +9,7 @@ import java.awt.*;
 
 public class MenuManager {
     private static final JFrame window = new JFrame();
-    private static JPanel menuPanel;
+    private static GameInstance game;
 
     public static void startMenu() {
         window.setTitle("Random Jumper");
@@ -17,7 +18,7 @@ public class MenuManager {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
 
-        menuPanel = new JPanel(new GridBagLayout());
+        JPanel menuPanel = new JPanel(new GridBagLayout());
         menuPanel.setBackground(Color.BLACK);
 
         JButton startButton = createButton("Start Game");
@@ -35,20 +36,17 @@ public class MenuManager {
     }
 
     private static void startGame() {
-        GamePanel gamePanel = new GamePanel();
+        game = new GameInstance();
 
-        window.setContentPane(gamePanel);
+        window.setContentPane(game.getPanel());
         window.revalidate();
         window.repaint();
 
-        SwingUtilities.invokeLater(gamePanel::requestFocusInWindow);
+        SwingUtilities.invokeLater(game.getPanel()::requestFocusInWindow);
     }
 
     public static void tryAgainMenu(GamePanel oldGamePanel) {
-        JFrame window = (JFrame) SwingUtilities.getWindowAncestor(oldGamePanel);
-        if (window == null) return;
-
-        oldGamePanel.stopGame();
+        game.stopGame();
 
         oldGamePanel.removeAll();
         oldGamePanel.setLayout(new GridBagLayout());
@@ -61,11 +59,11 @@ public class MenuManager {
         oldGamePanel.add(exitButton, gbc);
 
         tryAgainButton.addActionListener(e -> {
-            GamePanel newGamePanel = new GamePanel();
-            window.setContentPane(newGamePanel);
+            game = new GameInstance();
+            window.setContentPane(game.getPanel());
             window.revalidate();
             window.repaint();
-            SwingUtilities.invokeLater(newGamePanel::requestFocusInWindow);
+            SwingUtilities.invokeLater(game.getPanel()::requestFocusInWindow);
         });
 
         exitButton.addActionListener(e -> System.exit(0));
@@ -87,7 +85,7 @@ public class MenuManager {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.insets = new Insets(0, 0, 10, 0);
         return gbc;
     }
 }
