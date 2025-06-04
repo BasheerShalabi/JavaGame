@@ -1,10 +1,10 @@
 package game.randomjumper.core;
 
+import game.randomjumper.objects.Nut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public interface GameContext {
@@ -14,6 +14,6 @@ public interface GameContext {
     GamePanel getPanel();
     ArrayList<Rectangle> getPlatforms();
     ArrayList<Turret> getTurrets();
-    Ellipse2D.Double[] getNuts();
+    Nut[] getNuts();
     boolean isGameOver();
 }

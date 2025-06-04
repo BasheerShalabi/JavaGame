@@ -15,13 +15,15 @@ public class ImageManager {
     private static final HashMap<String, BufferedImage> images = new HashMap<>();
 
     public static void preLoadImages() {
-        preLoadImage("coin", "/images/nut.png" );
+        preLoadImage("nut", "/images/nut.png" );
+        preLoadImage("goldnut", "/images/gold nut.png" );
         preLoadImage("platform" , "/images/platform.png" );
         preLoadImage("ground", "/images/ground.png" );
         preLoadImage("background", "/images/background.png" );
         preLoadImage("speed-boost", "/images/speed-boost.png" );
         preLoadImage("jump-boost", "/images/jump-boost.png" );
         preLoadImage("double-jump-boost", "/images/double-jump-boost.png" );
+        preLoadImage("icon","/images/pixel-art-squirrel.png");
         loadPlayerSprites();
         loadProjectileSprites();
         // add all other images here
@@ -94,4 +96,5 @@ public class ImageManager {
     public static BufferedImage getImage(String key) {
         return images.get(key);
     }
+
 }

@@ -1,6 +1,7 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
+import game.randomjumper.objects.Nut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.audio.SoundManager;
@@ -14,9 +15,8 @@ public class GameEngine {
     private final HashMap<String,Integer> powerUps = new HashMap<>();
     private final Player player;
     private final ArrayList<Rectangle> platforms;
-    private final Ellipse2D.Double[] nuts;
+    private final Nut[] nuts;
     private final ArrayList<Turret> turrets;
-    private final GameRenderer renderer;
 
     private int verticalVelocity = 0;
     private int powerUpOffset=0;
@@ -43,7 +43,6 @@ public class GameEngine {
         platforms = instance.getPlatforms();
         nuts = instance.getNuts();
         turrets = instance.getTurrets();
-        renderer = instance.getRenderer();
     }
 
     public void setDevMode(){
@@ -212,8 +211,8 @@ public class GameEngine {
     private void checkNutCollisions() {
         for (int i = 0; i < nuts.length; i++) {
             if (nuts[i] == null) continue;
-            if (player.getPlayerRect().intersects(nuts[i].x, nuts[i].y, nuts[i].width, nuts[i].height)) {
-                player.setPlayerScore(player.getPlayerScore() + 1);
+            if (player.getPlayerRect().intersects(nuts[i].getHitbox().x, nuts[i].getHitbox().y, nuts[i].getHitbox().width, nuts[i].getHitbox().height)) {
+                player.setPlayerScore(player.getPlayerScore() + nuts[i].getScore());
                 nuts[i] = null;
                 SoundManager.playClip("nut");
             }
@@ -237,7 +236,7 @@ public class GameEngine {
     // Spawns new nuts on platforms at regular intervals
     private void spawnNuts() {
         boolean hasEmptySlot = false;
-        for (Ellipse2D nut : nuts) {
+        for (Nut nut : nuts) {
             if (nut == null) {
                 hasEmptySlot = true;
                 break;
@@ -250,11 +249,13 @@ public class GameEngine {
         }
 
         int i = (int) (Math.random() * nuts.length);
+        int randomOffset = (int) ((Math.random()*180)-90);
+        int goldChance = (int) (Math.random()*100);
         if (nuts[i] == null) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastNutTime >= GameConfig.NUT_SPAWN_DELAY) {
-                nuts[i] = new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X,
-                        platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE);
+                nuts[i] = new Nut(goldChance <= 2,new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X + randomOffset,
+                        platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE));
                 lastNutTime = currentTime;
             }
         }
@@ -337,4 +338,5 @@ public class GameEngine {
 
         return horizontalOverlap && verticalTouch;
     }
+
 }

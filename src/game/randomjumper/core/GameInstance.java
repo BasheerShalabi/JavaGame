@@ -5,18 +5,18 @@ import game.randomjumper.managers.audio.SoundManager;
 import game.randomjumper.managers.image.ImageManager;
 import game.randomjumper.managers.ui.FontManager;
 import game.randomjumper.managers.ui.MenuManager;
+import game.randomjumper.objects.Nut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class GameInstance extends Thread implements Runnable , GameContext{
     protected Player player;
     protected final ArrayList<Rectangle> platforms = new ArrayList<>();
-    protected Ellipse2D.Double[] nuts;
+    protected Nut[] nuts;
     protected GameEngine engine;
     protected GameRenderer renderer;
     protected GamePanel panel;
@@ -50,7 +50,7 @@ public class GameInstance extends Thread implements Runnable , GameContext{
         }
 
         //Initialize nut array
-        nuts = new Ellipse2D.Double[platforms.size()];
+        nuts = new Nut[platforms.size()];
 
         //Initialize the game engine
         engine = new GameEngine(this);
@@ -74,6 +74,7 @@ public class GameInstance extends Thread implements Runnable , GameContext{
     //This method executes when the thread starts, this is called the Game Loop
     @Override
     public void run(){
+        SoundManager.playMusic();
         //The infinite game loop! (until you lose ofc)
         //Updates 60 times a second
         while(!gameOver && !Thread.currentThread().isInterrupted()){
@@ -89,10 +90,6 @@ public class GameInstance extends Thread implements Runnable , GameContext{
             MenuManager.tryAgainMenu(panel);
         });
     }
-
-    //This method is important for instantaneous movement on button click
-    //The Key listener has a delay for long key presses which results in clunky movement, this here solves it by using booleans as states
-
 
     //The update method gets called inside the game loop
     private void update(){
@@ -120,13 +117,12 @@ public class GameInstance extends Thread implements Runnable , GameContext{
     public ArrayList<Turret> getTurrets(){
         return turrets;
     }@Override
-    public Ellipse2D.Double[] getNuts(){
+    public Nut[] getNuts(){
         return nuts;
     }@Override
     public boolean isGameOver(){
         return gameOver;
     }
-
 
 
 }

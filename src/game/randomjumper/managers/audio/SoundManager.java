@@ -1,5 +1,7 @@
 package game.randomjumper.managers.audio;
 
+
+
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.URL;
@@ -29,6 +31,7 @@ public class SoundManager {
         preloadSound("doublejump","/sounds/doublejump.wav");
         preloadSound("platform-swap","/sounds/platform-swap.wav");
         preloadSound("powerup","/sounds/powerup.wav");
+        preloadSound("music","/sounds/retro forest.wav");
     }
 
     public static void preloadSound(String key ,String path) {
@@ -73,6 +76,34 @@ public class SoundManager {
             });
 
             clip.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void playMusic() {
+        AudioData audioData = audioCache.get("music");
+        if (audioData == null) {
+            System.err.println("Sound not preloaded: music");
+            return;
+        }
+
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(audioData.bytes);
+            AudioInputStream ais = new AudioInputStream(bais, audioData.format, audioData.frameLength);
+
+            Clip clip = AudioSystem.getClip();
+            clip.open(ais);
+
+            clip.addLineListener(event -> {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    clip.close(); // clean up resources when done
+                }
+            });
+
+            FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(-15.0f);
+
+            clip.loop(9999);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

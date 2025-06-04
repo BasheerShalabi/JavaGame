@@ -1,12 +1,12 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
+import game.randomjumper.objects.Nut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.image.ImageManager;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class GameRenderer {
@@ -14,7 +14,7 @@ public class GameRenderer {
     private final Player player;
     private final ArrayList<Rectangle> platforms;
     private final ArrayList<Turret> turrets;
-    private final Ellipse2D.Double[] nuts;
+    private final Nut[] nuts;
     private final GameEngine engine;
     private boolean gameOver;
 
@@ -50,9 +50,9 @@ public class GameRenderer {
         }
 
         // Draw nuts
-        for (Ellipse2D.Double nut : nuts) {
+        for (Nut nut : nuts) {
             if (nut != null) {
-                g2d.drawImage(ImageManager.getImage("coin"),(int)(nut.x-(nut.width/3)),(int)(nut.y-(nut.height/3)),(int)(nut.width*1.5),(int)(nut.height*1.5),null);
+                g2d.drawImage(ImageManager.getImage(nut.isGold() ? "goldnut" : "nut"),(int)(nut.getHitbox().x-(nut.getHitbox().width/3)),(int)(nut.getHitbox().y-(nut.getHitbox().height/3)),(int)(nut.getHitbox().width*1.5),(int)(nut.getHitbox().height*1.5),null);
             }
         }
 
@@ -109,9 +109,9 @@ public class GameRenderer {
             }
 
             // Draw nuts
-            for (Ellipse2D.Double nut : nuts) {
+            for (Nut nut : nuts) {
                 if (nut != null) {
-                    g2d.drawRect((int)nut.x,(int)nut.y,(int)nut.width,(int)nut.height);
+                    g2d.drawRect((int)nut.getHitbox().x,(int)nut.getHitbox().y,(int)nut.getHitbox().width,(int)nut.getHitbox().height);
                 }
             }
 

@@ -3,6 +3,7 @@ package game.randomjumper.managers.ui;
 import game.randomjumper.config.GameConfig;
 import game.randomjumper.core.GameInstance;
 import game.randomjumper.core.GamePanel;
+import game.randomjumper.managers.image.ImageManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,7 @@ public class MenuManager {
 
     public static void startMenu() {
         window.setTitle("Random Jumper");
+        window.setIconImage(ImageManager.getImage("icon"));
         window.setSize(GameConfig.SCREEN_WIDTH, GameConfig.SCREEN_HEIGHT);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
