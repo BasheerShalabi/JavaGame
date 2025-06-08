@@ -9,8 +9,6 @@ public class Turret {
     private Projectile currentProjectile = null;
     private long nextFireTime = 0;
 
-    private final Random random = new Random();
-
     public Turret(int x, int y) {
         this.x = x;
         this.y = y;
@@ -43,7 +41,7 @@ public class Turret {
         }
 
         // Update projectile if alive
-        if (currentProjectile != null) {
+        if (currentProjectile != null && currentTimeMillis != 0) {
             currentProjectile.update();
         }
     }
@@ -52,8 +50,8 @@ public class Turret {
         currentProjectile = new Projectile(x, y-(GameConfig.NUT_OFFSET_Y /2));
     }
 
-    private void scheduleNextFire() {
-        int interval = GameConfig.PROJECTILE_MIN_FIRE_INTERVAL_MS + random.nextInt(GameConfig.PROJECTILE_MAX_FIRE_INTERVAL_MS - GameConfig.PROJECTILE_MIN_FIRE_INTERVAL_MS);
+    public void scheduleNextFire() {
+        int interval = (int)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2;
         nextFireTime = System.currentTimeMillis() + interval;
     }
 }

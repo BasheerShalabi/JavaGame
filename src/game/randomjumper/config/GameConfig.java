@@ -56,6 +56,7 @@ public class GameConfig {
     public static final int POWER_UP_DOUBLE_JUMP_SCORE = 100;
     public static final int POWER_UP_SPEED = 6;
     public static final int POWER_UP_JUMP_STRENGTH = -17;
+    public static final int POWER_UP_MESSAGE_INTERVAL = 2000;
 
     public static final int PENALTY_RANDOM_PLATFORMS = 200;
     public static final int PENALTY_RANDOM_PLATFORMS_INTERVAL = 10000;

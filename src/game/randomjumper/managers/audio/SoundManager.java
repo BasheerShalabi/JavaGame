@@ -1,7 +1,5 @@
 package game.randomjumper.managers.audio;
 
-
-
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.URL;
@@ -9,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SoundManager {
+
+     private static Clip music;
 
     private static class AudioData {
         byte[] bytes;
@@ -32,6 +32,7 @@ public class SoundManager {
         preloadSound("platform-swap","/sounds/platform-swap.wav");
         preloadSound("powerup","/sounds/powerup.wav");
         preloadSound("music","/sounds/retro forest.wav");
+        preloadSound("gameover","/sounds/gameover.wav");
     }
 
     public static void preloadSound(String key ,String path) {
@@ -91,21 +92,27 @@ public class SoundManager {
             ByteArrayInputStream bais = new ByteArrayInputStream(audioData.bytes);
             AudioInputStream ais = new AudioInputStream(bais, audioData.format, audioData.frameLength);
 
-            Clip clip = AudioSystem.getClip();
-            clip.open(ais);
+            music = AudioSystem.getClip();
+            music.open(ais);
 
-            clip.addLineListener(event -> {
+            music.addLineListener(event -> {
                 if (event.getType() == LineEvent.Type.STOP) {
-                    clip.close(); // clean up resources when done
+                    music.close(); // clean up resources when done
                 }
             });
 
-            FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            FloatControl volume = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
             volume.setValue(-15.0f);
 
-            clip.loop(9999);
+            music.loop(9999);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void stopMusic(){
+        music.stop();
+        music.flush();
+        music.close();
     }
 }

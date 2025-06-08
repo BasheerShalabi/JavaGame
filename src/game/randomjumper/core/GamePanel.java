@@ -42,6 +42,9 @@ public class GamePanel extends JPanel{
     //This method is important for instantaneous movement on button click
     //The Key listener has a delay for long key presses which results in clunky movement, this here solves it by using booleans as states
     protected void updateMovement(){
+        if(engine.isPaused()){
+            return;
+        }
         if (leftPressed && rightPressed){
             engine.setMoving(false);
         }else
@@ -62,6 +65,13 @@ public class GamePanel extends JPanel{
     private void handleKeyPress(KeyEvent e){
         if(gameOver) return;
         int key = e.getKeyCode();
+        if(key == KeyEvent.VK_ESCAPE){
+            engine.setIsPaused();
+        }
+
+        if(engine.isPaused()){
+            return;
+        }
 
         //Left and Right arrows
         if (key == KeyEvent.VK_LEFT) {
@@ -97,7 +107,6 @@ public class GamePanel extends JPanel{
     }
 
     //This method draws everything on the panel
-    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 

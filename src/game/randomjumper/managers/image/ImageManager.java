@@ -26,7 +26,6 @@ public class ImageManager {
         preLoadImage("icon","/images/pixel-art-squirrel.png");
         loadPlayerSprites();
         loadProjectileSprites();
-        // add all other images here
     }
 
     public static void warmUpImage(BufferedImage img) {

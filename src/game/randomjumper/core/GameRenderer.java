@@ -78,6 +78,11 @@ public class GameRenderer {
         g2d.setColor(Color.RED);
         g2d.drawString("Health: " + player.getPlayerHealth(), 50, 80);
 
+        g2d.drawString(engine.getMessage(),(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth(engine.getMessage())/2),GameConfig.SCREEN_HEIGHT/2);
+
+        if(engine.isPaused()){
+            g2d.drawString("Paused",(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth("Paused")/2),GameConfig.SCREEN_HEIGHT/2);
+        }
         // Show the Game over message
         if (gameOver) {
             g2d.setColor(new Color(0,0,0,.8f ));

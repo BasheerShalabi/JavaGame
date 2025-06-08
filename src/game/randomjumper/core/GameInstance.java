@@ -86,6 +86,8 @@ public class GameInstance extends Thread implements Runnable , GameContext{
                 return;
             }
         }
+        SoundManager.stopMusic();
+        SoundManager.playClip("gameover");
         SwingUtilities.invokeLater(() -> {
             MenuManager.tryAgainMenu(panel);
         });
@@ -101,25 +103,32 @@ public class GameInstance extends Thread implements Runnable , GameContext{
     @Override
     public Player getPlayer(){
         return player;
-    }@Override
+    }
+    @Override
     public GameEngine getEngine(){
         return engine;
-    }@Override
+    }
+    @Override
     public GamePanel getPanel(){
         return panel;
-    }@Override
+    }
+    @Override
     public GameRenderer getRenderer(){
         return renderer;
-    }@Override
+    }
+    @Override
     public ArrayList<Rectangle> getPlatforms(){
         return platforms;
-    }@Override
+    }
+    @Override
     public ArrayList<Turret> getTurrets(){
         return turrets;
-    }@Override
+    }
+    @Override
     public Nut[] getNuts(){
         return nuts;
-    }@Override
+    }
+    @Override
     public boolean isGameOver(){
         return gameOver;
     }

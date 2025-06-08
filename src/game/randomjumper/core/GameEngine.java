@@ -6,6 +6,7 @@ import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.audio.SoundManager;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class GameEngine {
 
     private int verticalVelocity = 0;
     private int powerUpOffset=0;
+    private int timer = 15;
 
     private boolean isMoving=false;
     private boolean isJumping = false;
@@ -32,10 +34,12 @@ public class GameEngine {
     private boolean isHit = false;
     private boolean hasSetAnimation = false;
     private boolean devMode = false;
+    private boolean isPaused = false;
 
     private long lastNutTime = System.currentTimeMillis();
     private long lastPlatformTime = System.currentTimeMillis();
-    private int timer = 15;
+
+    private String message = "";
 
     //Constructor
     public GameEngine(GameContext instance) {
@@ -51,6 +55,14 @@ public class GameEngine {
 
     public boolean isDevMode(){
         return devMode;
+    }
+
+    public void setIsPaused(){
+        isPaused = !isPaused;
+    }
+
+    public boolean isPaused(){
+        return isPaused;
     }
 
     //Getters Setters
@@ -85,9 +97,28 @@ public class GameEngine {
         return powerUps;
     }
 
+    public String getMessage(){
+        return message;
+    }
+
+    public void setMessage(String message){
+        this.message = message;
+        Timer timer = new Timer(GameConfig.POWER_UP_MESSAGE_INTERVAL,e -> {
+            this.message = "";
+        });
+
+        timer.setRepeats(false);
+        timer.start();
+    }
+
 
     //Update
     public void update() {
+        if(isPaused){
+            lastNutTime = System.currentTimeMillis();
+            updateTurrets();
+            return ;
+        }
         applyPhysics();
         checkNutCollisions();
         spawnNuts();
@@ -227,7 +258,7 @@ public class GameEngine {
                 this.isHit = true;
                 player.setPlayerHealth(player.getPlayerHealth() - GameConfig.PROJECTILE_DAMAGE);
                 turret.setNullProjectile();
-                turret.setNextFireTime(System.currentTimeMillis()+(long)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2);
+                turret.scheduleNextFire();
                 SoundManager.playClip("hit");
             }
         }
@@ -287,7 +318,10 @@ public class GameEngine {
     // Updates turrets, including their projectile positions and firing intervals
     private void updateTurrets(){
         for(Turret turret : turrets){
-            turret.update(System.currentTimeMillis());
+            if (isPaused){
+                turret.scheduleNextFire();
+            }
+            turret.update(isPaused ? 0 : System.currentTimeMillis());
         }
     }
 
@@ -306,13 +340,20 @@ public class GameEngine {
         }
     }
 
-    public void setPowerUp(String key){
-        if(!powerUps.containsKey(key)){
-            powerUpOffset+=60;
-            powerUps.put(key,powerUpOffset);
+    public void setPowerUp(String key) {
+        if (!powerUps.containsKey(key)) {
+            powerUpOffset += 60;
+            powerUps.put(key, powerUpOffset);
             SoundManager.playClip("powerup");
+            switch(key){
+                case "speed-boost": setMessage("SPEED BOOST !");break;
+                case "jump-boost": setMessage("JUMP BOOST !");break;
+                case "double-jump-boost": setMessage("YOU CAN DOUBLE JUMP !");break;
+                default:
+            }
         }
     }
+
 
     //a method to check for intersection between 2 rectangles (not my doing, edit at your own risk!)
     public static boolean doesTopIntersect(
