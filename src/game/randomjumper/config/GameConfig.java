@@ -11,7 +11,6 @@ public class GameConfig {
 
     public static final int PROJECTILE_MIN_FIRE_INTERVAL_MS = 1000;
     public static final int PROJECTILE_MAX_FIRE_INTERVAL_MS = 5000;
-    public static final int PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS = 4000;
     public static final int PROJECTILE_ANIMATION_FRAME_COUNT = 6;
     public static final int PROJECTILE_DAMAGE = 15;
     public static final int PROJECTILE_SPEED = 3;

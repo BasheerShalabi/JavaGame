@@ -23,10 +23,6 @@ public class Turret {
         this.currentProjectile = null;
     }
 
-    public void setNextFireTime(long nextFireTime) {
-        this.nextFireTime = nextFireTime;
-    }
-
     public void update(long currentTimeMillis) {
 
         // Remove the projectile if it is no longer active and schedule the next one
@@ -51,7 +47,7 @@ public class Turret {
     }
 
     public void scheduleNextFire() {
-        int interval = (int)(Math.random()*GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2)+GameConfig.PROJECTILE_FIRE_COOLDOWN_INTERVAL_MS/2;
-        nextFireTime = System.currentTimeMillis() + interval;
+        int offset = (int)((Math.random()*GameConfig.PROJECTILE_MAX_FIRE_INTERVAL_MS)+GameConfig.PROJECTILE_MIN_FIRE_INTERVAL_MS);
+        nextFireTime = System.currentTimeMillis() + offset;
     }
 }

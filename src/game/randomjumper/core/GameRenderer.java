@@ -16,7 +16,6 @@ public class GameRenderer {
     private final ArrayList<Turret> turrets;
     private final Nut[] nuts;
     private final GameEngine engine;
-    private boolean gameOver;
 
 
     public GameRenderer(GameContext instance){
@@ -24,7 +23,6 @@ public class GameRenderer {
         this.platforms = instance.getPlatforms();
         this.turrets = instance.getTurrets();
         this.nuts = instance.getNuts();
-        this.gameOver = instance.isGameOver();
         this.engine = instance.getEngine();
 
     }
@@ -83,8 +81,9 @@ public class GameRenderer {
         if(engine.isPaused()){
             g2d.drawString("Paused",(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth("Paused")/2),GameConfig.SCREEN_HEIGHT/2);
         }
+
         // Show the Game over message
-        if (gameOver) {
+        if (engine.isGameOver()) {
             g2d.setColor(new Color(0,0,0,.8f ));
             g2d.fillRect((GameConfig.SCREEN_WIDTH/3)-10,(GameConfig.SCREEN_HEIGHT/3)-70,GameConfig.SCREEN_WIDTH/3,GameConfig.SCREEN_HEIGHT/3);
             g2d.setColor(Color.RED);
