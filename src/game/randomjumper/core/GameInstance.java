@@ -5,7 +5,8 @@ import game.randomjumper.managers.audio.SoundManager;
 import game.randomjumper.managers.image.ImageManager;
 import game.randomjumper.managers.ui.FontManager;
 import game.randomjumper.managers.ui.MenuManager;
-import game.randomjumper.objects.Nut;
+import game.randomjumper.objects.PickUp;
+import game.randomjumper.objects.ScoreNut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 public class GameInstance extends Thread implements Runnable , GameContext{
     protected Player player;
     protected final ArrayList<Rectangle> platforms = new ArrayList<>();
-    protected Nut[] nuts;
+    protected PickUp[] pickUps;
     protected GameEngine engine;
     protected GameRenderer renderer;
     protected GamePanel panel;
@@ -50,7 +51,7 @@ public class GameInstance extends Thread implements Runnable , GameContext{
         }
 
         //Initialize nut array
-        nuts = new Nut[platforms.size()];
+        pickUps = new PickUp[platforms.size()];
 
         //Initialize the game engine
         engine = new GameEngine(this);
@@ -125,8 +126,8 @@ public class GameInstance extends Thread implements Runnable , GameContext{
         return turrets;
     }
     @Override
-    public Nut[] getNuts(){
-        return nuts;
+    public PickUp[] getPickUps(){
+        return pickUps;
     }
     @Override
     public boolean isGameOver(){

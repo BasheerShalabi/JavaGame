@@ -15,14 +15,19 @@ public class ImageManager {
     private static final HashMap<String, BufferedImage> images = new HashMap<>();
 
     public static void preLoadImages() {
-        preLoadImage("nut", "/images/nut.png" );
-        preLoadImage("goldnut", "/images/gold nut.png" );
+        preLoadImage("nut", "/images/pickups/nut.png" );
+        preLoadImage("goldnut", "/images/pickups/gold nut.png" );
+        preLoadImage("apple", "/images/pickups/apple.png" );
+        preLoadImage("leaf", "/images/pickups/leaf.png" );
+
         preLoadImage("platform" , "/images/platform.png" );
         preLoadImage("ground", "/images/ground.png" );
         preLoadImage("background", "/images/background.png" );
-        preLoadImage("speed-boost", "/images/speed-boost.png" );
-        preLoadImage("jump-boost", "/images/jump-boost.png" );
-        preLoadImage("double-jump-boost", "/images/double-jump-boost.png" );
+
+        preLoadImage("speed-boost", "/images/powerups/speed-boost.png" );
+        preLoadImage("jump-boost", "/images/powerups/jump-boost.png" );
+        preLoadImage("double-jump-boost", "/images/powerups/double-jump-boost.png" );
+
         preLoadImage("icon","/images/pixel-art-squirrel.png");
         loadPlayerSprites();
         loadProjectileSprites();

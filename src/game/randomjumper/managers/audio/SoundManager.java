@@ -33,6 +33,8 @@ public class SoundManager {
         preloadSound("powerup","/sounds/powerup.wav");
         preloadSound("music","/sounds/retro forest.wav");
         preloadSound("gameover","/sounds/gameover.wav");
+        preloadSound("apple","/sounds/apple.wav");
+        preloadSound("leaf","/sounds/leaf.wav");
     }
 
     public static void preloadSound(String key ,String path) {

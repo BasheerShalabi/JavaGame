@@ -1,6 +1,7 @@
 package game.randomjumper.core;
 
-import game.randomjumper.objects.Nut;
+import game.randomjumper.objects.PickUp;
+import game.randomjumper.objects.ScoreNut;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 
@@ -14,6 +15,6 @@ public interface GameContext {
     GamePanel getPanel();
     ArrayList<Rectangle> getPlatforms();
     ArrayList<Turret> getTurrets();
-    Nut[] getNuts();
+    PickUp[] getPickUps();
     boolean isGameOver();
 }

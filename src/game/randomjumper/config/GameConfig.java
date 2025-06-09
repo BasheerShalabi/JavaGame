@@ -45,7 +45,7 @@ public class GameConfig {
     public static final int MAX_DOWN_ACCELERATION = 10;
     public static final int GROUND_LEVEL = SCREEN_HEIGHT - GROUND_OFFSET;
 
-    public static final int NUT_SPAWN_DELAY = 1500;
+    public static final int PICK_UP_SPAWN_DELAY = 1500;
     public static final int NUT_SIZE = 20;
     public static final int NUT_OFFSET_X = 10;
     public static final int NUT_OFFSET_Y = 50;
@@ -53,6 +53,8 @@ public class GameConfig {
     public static final int POWER_UP_SPEED_SCORE = 30;
     public static final int POWER_UP_JUMP_SCORE = 50;
     public static final int POWER_UP_DOUBLE_JUMP_SCORE = 100;
+    public static final int POWER_UP_HEALTH_PICKUP_SCORE = 150;
+    public static final int POWER_UP_SHIELD_PICKUP_SCORE = 250;
     public static final int POWER_UP_SPEED = 6;
     public static final int POWER_UP_JUMP_STRENGTH = -17;
     public static final int POWER_UP_MESSAGE_INTERVAL = 2000;

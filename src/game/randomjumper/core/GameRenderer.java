@@ -1,7 +1,7 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.objects.Nut;
+import game.randomjumper.objects.PickUp;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.image.ImageManager;
@@ -14,7 +14,7 @@ public class GameRenderer {
     private final Player player;
     private final ArrayList<Rectangle> platforms;
     private final ArrayList<Turret> turrets;
-    private final Nut[] nuts;
+    private final PickUp[] pickUps;
     private final GameEngine engine;
 
 
@@ -22,7 +22,7 @@ public class GameRenderer {
         this.player = instance.getPlayer();
         this.platforms = instance.getPlatforms();
         this.turrets = instance.getTurrets();
-        this.nuts = instance.getNuts();
+        this.pickUps = instance.getPickUps();
         this.engine = instance.getEngine();
 
     }
@@ -48,9 +48,9 @@ public class GameRenderer {
         }
 
         // Draw nuts
-        for (Nut nut : nuts) {
-            if (nut != null) {
-                g2d.drawImage(ImageManager.getImage(nut.isGold() ? "goldnut" : "nut"),(int)(nut.getHitbox().x-(nut.getHitbox().width/3)),(int)(nut.getHitbox().y-(nut.getHitbox().height/3)),(int)(nut.getHitbox().width*1.5),(int)(nut.getHitbox().height*1.5),null);
+        for (PickUp pickUp : pickUps) {
+            if (pickUp != null) {
+                g2d.drawImage(ImageManager.getImage(pickUp.getImageKey()),(int)(pickUp.getHitbox().x-(pickUp.getHitbox().width/3)),(int)(pickUp.getHitbox().y-(pickUp.getHitbox().height/3)),(int)(pickUp.getHitbox().width*1.5),(int)(pickUp.getHitbox().height*1.5),null);
             }
         }
 
@@ -67,7 +67,7 @@ public class GameRenderer {
         });
 
         g2d.setColor(new Color(0,0,0,.8f ));
-        g2d.fillRoundRect(20,15,250,100,10,10);
+        g2d.fillRoundRect(20,15,250,120,10,10);
         // Draw score
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("JoystixMonospace-Regular", Font.BOLD, 20));
@@ -75,7 +75,9 @@ public class GameRenderer {
         // Draw health
         g2d.setColor(Color.RED);
         g2d.drawString("Health: " + player.getPlayerHealth(), 50, 80);
-
+        g2d.setColor(Color.BLUE);
+        g2d.drawString("Shield: " + player.getPlayerShield(), 50, 110);
+        g2d.setColor(Color.RED);
         g2d.drawString(engine.getMessage(),(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth(engine.getMessage())/2),GameConfig.SCREEN_HEIGHT/2);
 
         if(engine.isPaused()){
@@ -113,9 +115,9 @@ public class GameRenderer {
             }
 
             // Draw nuts
-            for (Nut nut : nuts) {
-                if (nut != null) {
-                    g2d.drawRect((int)nut.getHitbox().x,(int)nut.getHitbox().y,(int)nut.getHitbox().width,(int)nut.getHitbox().height);
+            for (PickUp pickUp : pickUps) {
+                if (pickUp != null) {
+                    g2d.drawRect((int) pickUp.getHitbox().x,(int) pickUp.getHitbox().y,(int) pickUp.getHitbox().width,(int) pickUp.getHitbox().height);
                 }
             }
 

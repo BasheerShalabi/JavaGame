@@ -1,9 +1,7 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.objects.Nut;
-import game.randomjumper.objects.Player;
-import game.randomjumper.objects.Turret;
+import game.randomjumper.objects.*;
 import game.randomjumper.managers.audio.SoundManager;
 
 import javax.swing.*;
@@ -16,7 +14,7 @@ public class GameEngine {
     private final HashMap<String,Integer> powerUps = new HashMap<>();
     private final Player player;
     private final ArrayList<Rectangle> platforms;
-    private final Nut[] nuts;
+    private final PickUp[] pickUps;
     private final ArrayList<Turret> turrets;
 
     private int verticalVelocity = 0;
@@ -35,8 +33,10 @@ public class GameEngine {
     private boolean hasSetAnimation = false;
     private boolean devMode = false;
     private boolean isPaused = false;
+    private boolean canSpawnHealthApples = false;
+    private boolean canSpawnShieldLeafs = false;
 
-    private long lastNutTime = System.currentTimeMillis();
+    private long lastPickUpTime = System.currentTimeMillis();
     private long lastPlatformTime = System.currentTimeMillis();
 
     private String message = "";
@@ -45,7 +45,7 @@ public class GameEngine {
     public GameEngine(GameContext instance) {
         player = instance.getPlayer();
         platforms = instance.getPlatforms();
-        nuts = instance.getNuts();
+        pickUps = instance.getPickUps();
         turrets = instance.getTurrets();
     }
 
@@ -115,13 +115,13 @@ public class GameEngine {
     //Update
     public void update() {
         if(isPaused){
-            lastNutTime = System.currentTimeMillis();
+            lastPickUpTime = System.currentTimeMillis();
             updateTurrets();
             return ;
         }
         applyPhysics();
-        checkNutCollisions();
-        spawnNuts();
+        checkPickUpCollisions();
+        spawnPickUps();
         checkPowerUps();
         updateTurrets();
         CheckProjectileCollisions();
@@ -239,13 +239,21 @@ public class GameEngine {
     }
 
     // Checks for collisions between player and nuts, updates score accordingly
-    private void checkNutCollisions() {
-        for (int i = 0; i < nuts.length; i++) {
-            if (nuts[i] == null) continue;
-            if (player.getPlayerRect().intersects(nuts[i].getHitbox().x, nuts[i].getHitbox().y, nuts[i].getHitbox().width, nuts[i].getHitbox().height)) {
-                player.setPlayerScore(player.getPlayerScore() + nuts[i].getScore());
-                nuts[i] = null;
+    private void checkPickUpCollisions() {
+        for (int i = 0; i < pickUps.length; i++) {
+            if (pickUps[i] == null) continue;
+            if (player.getPlayerRect().intersects(pickUps[i].getHitbox().x, pickUps[i].getHitbox().y, pickUps[i].getHitbox().width, pickUps[i].getHitbox().height)) {
+                if(pickUps[i] instanceof HealthApple){
+                    player.setPlayerHealth(player.getPlayerHealth() +((HealthApple) pickUps[i]).getHealthValue());
+                    SoundManager.playClip("apple");
+                }else if(pickUps[i] instanceof ShieldLeaf){
+                    player.setPlayerShield(player.getPlayerShield() +((ShieldLeaf) pickUps[i]).getShieldValue());
+                    SoundManager.playClip("leaf");
+                }else{
+                player.setPlayerScore(player.getPlayerScore() + ((ScoreNut) pickUps[i]).getScore());
                 SoundManager.playClip("nut");
+                }
+                pickUps[i] = null;
             }
         }
     }
@@ -256,7 +264,11 @@ public class GameEngine {
             if (turret.getProjectile() == null) continue;
             if (player.getPlayerRect().intersects(turret.getProjectile().hitBox())) {
                 this.isHit = true;
-                player.setPlayerHealth(player.getPlayerHealth() - GameConfig.PROJECTILE_DAMAGE);
+                if(player.hasShield()){
+                    player.setPlayerShield(player.getPlayerShield() - GameConfig.PROJECTILE_DAMAGE);
+                }else {
+                    player.setPlayerHealth(player.getPlayerHealth() - GameConfig.PROJECTILE_DAMAGE);
+                }
                 turret.setNullProjectile();
                 turret.scheduleNextFire();
                 SoundManager.playClip("hit");
@@ -265,29 +277,36 @@ public class GameEngine {
     }
 
     // Spawns new nuts on platforms at regular intervals
-    private void spawnNuts() {
+    private void spawnPickUps() {
         boolean hasEmptySlot = false;
-        for (Nut nut : nuts) {
-            if (nut == null) {
+        for (PickUp pickUp : pickUps) {
+            if (pickUp == null) {
                 hasEmptySlot = true;
                 break;
             }
         }
 
         if (!hasEmptySlot) {
-            lastNutTime = System.currentTimeMillis();
+            lastPickUpTime = System.currentTimeMillis();
             return;
         }
 
-        int i = (int) (Math.random() * nuts.length);
+        int i = (int) (Math.random() * pickUps.length);
         int randomOffset = (int) ((Math.random()*180)-90);
-        int goldChance = (int) (Math.random()*100);
-        if (nuts[i] == null) {
+        if (pickUps[i] == null) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastNutTime >= GameConfig.NUT_SPAWN_DELAY) {
-                nuts[i] = new Nut(goldChance <= 2,new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X + randomOffset,
-                        platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE));
-                lastNutTime = currentTime;
+            if (currentTime - lastPickUpTime >= GameConfig.PICK_UP_SPAWN_DELAY) {
+                    if (canSpawnHealthApples && (Math.random() * 100) <= 7) {
+                        pickUps[i] = new HealthApple(new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X + randomOffset,
+                                platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE));
+                    } else if (canSpawnShieldLeafs && (Math.random() * 100) <= 5) {
+                        pickUps[i] = new ShieldLeaf(new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X + randomOffset,
+                                platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE));
+                    } else {
+                        pickUps[i] = new ScoreNut((Math.random() * 100) <= 2, new Ellipse2D.Double(platforms.get(i).x + (double) platforms.get(i).width / 2 - GameConfig.NUT_OFFSET_X + randomOffset,
+                                platforms.get(i).y + (double) platforms.get(i).height / 2 - GameConfig.NUT_OFFSET_Y, GameConfig.NUT_SIZE, GameConfig.NUT_SIZE));
+                    }
+                    lastPickUpTime = currentTime;
             }
         }
     }
@@ -312,6 +331,12 @@ public class GameEngine {
         }
         if(player.getPlayerScore() >= GameConfig.PENALTY_RANDOM_PLATFORMS){
             canRandomizePlatforms=true;
+        }
+        if(player.getPlayerScore() >= GameConfig.POWER_UP_HEALTH_PICKUP_SCORE){
+            canSpawnHealthApples=true;
+        }
+        if(player.getPlayerScore() >= GameConfig.POWER_UP_SHIELD_PICKUP_SCORE){
+            canSpawnShieldLeafs=true;
         }
     }
 

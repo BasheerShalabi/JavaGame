@@ -16,7 +16,9 @@ public class Player extends Animatable {
 
     private int score = 0;
     private int playerHealth = GameConfig.PLAYER_HEALTH;
+    private int playerShield = 0;
     private int direction = 1;
+    private boolean hasShield = false;
 
     public Player(int x, int y) {
         super("idle");
@@ -84,8 +86,32 @@ public class Player extends Animatable {
         return playerHealth;
     }
 
+    public int getPlayerShield(){
+        return playerShield;
+    }
+
+    public boolean hasShield(){
+        return hasShield;
+    }
+
+    public void setPlayerShield(int playerShield){
+        hasShield = playerShield > 0;
+        if(playerShield > 100){
+            this.playerShield = 100;
+        }else if(playerShield < 0) {
+            playerHealth += playerShield;
+            this.playerShield = 0;
+        }else{
+            this.playerShield = playerShield;
+        }
+    }
+
     public void setPlayerHealth(int playerHealth) {
-        this.playerHealth = Math.max(playerHealth, 0);
+        if(playerHealth > 100){
+            this.playerHealth = 100;
+        }else {
+            this.playerHealth = Math.max(playerHealth, 0);
+        }
     }
 
     public void setAnimation(String key,int interval,int frameCount){
