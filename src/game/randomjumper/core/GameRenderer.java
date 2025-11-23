@@ -1,12 +1,14 @@
 package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.objects.PickUp;
+import game.randomjumper.objects.pickups.PickUp;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 import game.randomjumper.managers.image.ImageManager;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.util.ArrayList;
 
 public class GameRenderer {
@@ -25,6 +27,22 @@ public class GameRenderer {
         this.pickUps = instance.getPickUps();
         this.engine = instance.getEngine();
 
+    }
+
+    private static void drawOutlinedText(Graphics2D g2d,String text, int x , int y){
+        if(text.isEmpty()) return;
+        Font font = new Font("JoystixMonospace-Regular", Font.BOLD, 20);
+        FontRenderContext frc = g2d.getFontRenderContext();
+        TextLayout textLayout = new TextLayout(text, font, frc);
+        Shape outline = textLayout.getOutline(null);
+        Stroke stroke = new BasicStroke(3);
+        Shape strokedOutline = stroke.createStrokedShape(outline);
+
+        g2d.translate(x,y);
+        g2d.setColor(Color.BLACK);
+        g2d.fill(strokedOutline);
+        g2d.setColor(Color.RED);
+        g2d.fill(outline);
     }
 
     public void render(Graphics g) {
@@ -61,6 +79,10 @@ public class GameRenderer {
             }
         }
 
+        if(player.hasShield()){
+            g2d.drawImage(ImageManager.getImage("shield"),player.getPlayerX()-(player.getPlayerWidth()/5), player.getPlayerY()-(player.getPlayerHeight()/5), (int)(player.getPlayerWidth()*1.5),(int)(player.getPlayerHeight()*1.5),null);
+        }
+
         // Draw Power ups
         engine.getPowerUps().forEach((k,v) -> {
             g2d.drawImage(ImageManager.getImage(k),GameConfig.SCREEN_WIDTH-v,20,40,40,null);
@@ -78,7 +100,7 @@ public class GameRenderer {
         g2d.setColor(Color.BLUE);
         g2d.drawString("Shield: " + player.getPlayerShield(), 50, 110);
         g2d.setColor(Color.RED);
-        g2d.drawString(engine.getMessage(),(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth(engine.getMessage())/2),GameConfig.SCREEN_HEIGHT/2);
+        drawOutlinedText(g2d,engine.getMessage(),(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth(engine.getMessage())/2),GameConfig.SCREEN_HEIGHT/2);
 
         if(engine.isPaused()){
             g2d.drawString("Paused",(GameConfig.SCREEN_WIDTH/2)-(g2d.getFontMetrics().stringWidth("Paused")/2),GameConfig.SCREEN_HEIGHT/2);

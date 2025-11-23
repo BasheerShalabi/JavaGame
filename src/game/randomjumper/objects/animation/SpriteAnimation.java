@@ -1,4 +1,4 @@
-package game.randomjumper.managers.animation;
+package game.randomjumper.objects.animation;
 
 import game.randomjumper.managers.image.ImageManager;
 
@@ -16,9 +16,9 @@ public class SpriteAnimation {
         this.lastFrameTime = System.currentTimeMillis();
     }
 
-    public void update() {
+    public void update(double delta) {
         long now = System.currentTimeMillis();
-        if (now - lastFrameTime >= frameDelay) {
+        if (now - lastFrameTime >= (frameDelay * delta)) {
             frameIndex = (frameIndex + 1) % frames.length;
             lastFrameTime = now;
         }

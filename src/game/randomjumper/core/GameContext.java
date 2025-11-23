@@ -1,7 +1,6 @@
 package game.randomjumper.core;
 
-import game.randomjumper.objects.PickUp;
-import game.randomjumper.objects.ScoreNut;
+import game.randomjumper.objects.pickups.PickUp;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 

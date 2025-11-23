@@ -1,9 +1,10 @@
 package game.randomjumper.objects;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.managers.animation.Animatable;
+import game.randomjumper.objects.animation.Animatable;
+import game.randomjumper.managers.audio.SoundManager;
 import game.randomjumper.managers.image.ImageManager;
-import game.randomjumper.managers.animation.SpriteAnimation;
+import game.randomjumper.objects.animation.SpriteAnimation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,16 +31,16 @@ public class Player extends Animatable {
         animations.put("hurt", SpriteAnimation.loadAnimation("hurt", GameConfig.PLAYER_HURT_ANIMATION_FRAME_COUNT, GameConfig.PLAYER_ANIMATION_INTERVAL,"player/"));
     }
 
-    public void moveLeft() {
-        this.playerRect.x -= playerSpeed;
+    public void moveLeft(double delta) {
+        this.playerRect.x -= (int) (playerSpeed * delta);
     }
 
     public void setDirection(int direction) {
         this.direction = direction;
     }
 
-    public void moveRight() {
-        this.playerRect.x += playerSpeed;
+    public void moveRight(double delta) {
+        this.playerRect.x += (int) (playerSpeed * delta);
     }
 
     public int getPlayerX() {
@@ -98,9 +99,10 @@ public class Player extends Animatable {
         hasShield = playerShield > 0;
         if(playerShield > 100){
             this.playerShield = 100;
-        }else if(playerShield < 0) {
+        }else if(playerShield <= 0) {
             playerHealth += playerShield;
             this.playerShield = 0;
+            SoundManager.playClip("shield-break");
         }else{
             this.playerShield = playerShield;
         }

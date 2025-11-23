@@ -6,6 +6,7 @@ import game.randomjumper.core.GamePanel;
 import game.randomjumper.managers.image.ImageManager;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 public class MenuManager {
@@ -90,4 +91,5 @@ public class MenuManager {
         gbc.insets = new Insets(0, 0, 10, 0);
         return gbc;
     }
+
 }

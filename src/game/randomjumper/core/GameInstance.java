@@ -2,11 +2,8 @@ package game.randomjumper.core;
 
 import game.randomjumper.config.GameConfig;
 import game.randomjumper.managers.audio.SoundManager;
-import game.randomjumper.managers.image.ImageManager;
-import game.randomjumper.managers.ui.FontManager;
 import game.randomjumper.managers.ui.MenuManager;
-import game.randomjumper.objects.PickUp;
-import game.randomjumper.objects.ScoreNut;
+import game.randomjumper.objects.pickups.PickUp;
 import game.randomjumper.objects.Player;
 import game.randomjumper.objects.Turret;
 
@@ -33,10 +30,6 @@ public class GameInstance extends Thread implements Runnable , GameContext{
 
     //Initialize Game Objects and start a thread
     private void startGame(){
-        SoundManager.preloadSounds();
-        ImageManager.preLoadImages();
-        FontManager.loadFont();
-
         //Initialize player
         player = new Player(GameConfig.INITIAL_PLAYER_X, GameConfig.INITIAL_PLAYER_Y);
 
@@ -76,15 +69,32 @@ public class GameInstance extends Thread implements Runnable , GameContext{
     @Override
     public void run(){
         SoundManager.playMusic();
+
+        final long optimalTime = 1_000_000_000 / GameConfig.TARGET_FPS; // 1 second in nanoseconds
+
+        long lastLoopTime = System.nanoTime();
+
         //The infinite game loop! (until you lose ofc)
         //Updates 60 times a second
         while(!gameOver && !Thread.currentThread().isInterrupted()){
-            update();
+
+            long now = System.nanoTime();
+            long updateLength = now - lastLoopTime;
+            lastLoopTime = now;
+
+            double delta = updateLength / (double) optimalTime;
+
+            update(delta);
             panel.repaint();
-            try{
-                Thread.sleep(GameConfig.FRAME_TIME);
-            }catch(InterruptedException e){
-                return;
+
+            long sleepTime = (lastLoopTime + optimalTime - System.nanoTime()) / 1_000_000;
+            if(sleepTime > 0){
+                try{
+                    Thread.sleep(sleepTime);
+                }catch(InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
         }
         SoundManager.stopMusic();
@@ -95,9 +105,9 @@ public class GameInstance extends Thread implements Runnable , GameContext{
     }
 
     //The update method gets called inside the game loop
-    private void update(){
-        panel.updateMovement();
-        engine.update();
+    private void update(double delta){
+        panel.updateMovement(delta);
+        engine.update(delta);
         gameOver=engine.isGameOver();
     }
 

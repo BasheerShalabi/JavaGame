@@ -41,7 +41,7 @@ public class GamePanel extends JPanel{
 
     //This method is important for instantaneous movement on button click
     //The Key listener has a delay for long key presses which results in clunky movement, this here solves it by using booleans as states
-    protected void updateMovement(){
+    protected void updateMovement(double delta){
         if(engine.isPaused()){
             return;
         }
@@ -49,13 +49,13 @@ public class GamePanel extends JPanel{
             engine.setMoving(false);
         }else
         if (leftPressed) {
-            engine.moveLeft();
+            engine.moveLeft(delta);
             engine.setMoving(true);
             player.setDirection(1);
 
         }else
         if (rightPressed) {
-            engine.moveRight();
+            engine.moveRight(delta);
             engine.setMoving(true);
             player.setDirection(-1);
         }

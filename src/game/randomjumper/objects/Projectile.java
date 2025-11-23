@@ -1,8 +1,8 @@
 package game.randomjumper.objects;
 
 import game.randomjumper.config.GameConfig;
-import game.randomjumper.managers.animation.Animatable;
-import game.randomjumper.managers.animation.SpriteAnimation;
+import game.randomjumper.objects.animation.Animatable;
+import game.randomjumper.objects.animation.SpriteAnimation;
 import game.randomjumper.managers.image.ImageManager;
 
 import java.awt.*;
@@ -17,11 +17,7 @@ public class Projectile extends Animatable {
     public Projectile(int x, int y) {
         super("projectile");
         this.projectile = new Ellipse2D.Double(x, y, GameConfig.PROJECTILE_WIDTH, GameConfig.PROJECTILE_HEIGHT);
-        if(x == 0){
-            this.direction = 1;
-        }else{
-            this.direction = -1;
-        }
+        this.direction = (x == 0 ? 1 : -1);
 
         animations.put("projectile", SpriteAnimation.loadAnimation("projectile",6,50,""));
     }
@@ -39,9 +35,9 @@ public class Projectile extends Animatable {
     }
 
     @Override
-    public void update() {
-        animations.get(currentState).update();
-        this.projectile.x += GameConfig.PROJECTILE_SPEED * this.direction;
+    public void update(double delta) {
+        animations.get(currentState).update(delta);
+        this.projectile.x += (GameConfig.PROJECTILE_SPEED * this.direction)*delta;
         if (this.projectile.x < 0 || this.projectile.x > GameConfig.SCREEN_WIDTH) this.active = false;
     }
 

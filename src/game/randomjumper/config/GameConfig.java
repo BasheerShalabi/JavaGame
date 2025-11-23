@@ -7,7 +7,7 @@ public class GameConfig {
 
     public static final int SCREEN_WIDTH = 1000;
     public static final int SCREEN_HEIGHT = 800;
-    public static final int FRAME_TIME = 1000/60;
+    public static final int TARGET_FPS = 60;
 
     public static final int PROJECTILE_MIN_FIRE_INTERVAL_MS = 1000;
     public static final int PROJECTILE_MAX_FIRE_INTERVAL_MS = 5000;

@@ -1,4 +1,4 @@
-package game.randomjumper.objects;
+package game.randomjumper.objects.pickups;
 
 import java.awt.geom.Ellipse2D;
 

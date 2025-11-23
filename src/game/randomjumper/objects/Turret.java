@@ -23,7 +23,7 @@ public class Turret {
         this.currentProjectile = null;
     }
 
-    public void update(long currentTimeMillis) {
+    public void update(long currentTimeMillis , double delta) {
 
         // Remove the projectile if it is no longer active and schedule the next one
         if (currentProjectile != null && !currentProjectile.isActive()) {
@@ -38,7 +38,7 @@ public class Turret {
 
         // Update projectile if alive
         if (currentProjectile != null && currentTimeMillis != 0) {
-            currentProjectile.update();
+            currentProjectile.update(delta);
         }
     }
 

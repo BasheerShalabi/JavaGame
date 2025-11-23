@@ -35,6 +35,7 @@ public class SoundManager {
         preloadSound("gameover","/sounds/gameover.wav");
         preloadSound("apple","/sounds/apple.wav");
         preloadSound("leaf","/sounds/leaf.wav");
+        preloadSound("shield-break","/sounds/shield break.wav");
     }
 
     public static void preloadSound(String key ,String path) {

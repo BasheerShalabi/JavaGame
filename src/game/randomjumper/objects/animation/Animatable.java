@@ -1,4 +1,4 @@
-package game.randomjumper.managers.animation;
+package game.randomjumper.objects.animation;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -11,8 +11,8 @@ public abstract class Animatable {
      protected Animatable(String currentState){
          this.currentState = currentState;
      }
-     public void update() {
-         animations.get(currentState).update();
+     public void update(double delta) {
+         animations.get(currentState).update(delta);
      }
 
      public abstract void draw(Graphics2D g);

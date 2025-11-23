@@ -3,6 +3,10 @@ package game.randomjumper.core;
 import game.randomjumper.config.GameConfig;
 import game.randomjumper.objects.*;
 import game.randomjumper.managers.audio.SoundManager;
+import game.randomjumper.objects.pickups.HealthApple;
+import game.randomjumper.objects.pickups.PickUp;
+import game.randomjumper.objects.pickups.ScoreNut;
+import game.randomjumper.objects.pickups.ShieldLeaf;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,6 +105,7 @@ public class GameEngine {
         return message;
     }
 
+
     public void setMessage(String message){
         this.message = message;
         Timer timer = new Timer(GameConfig.POWER_UP_MESSAGE_INTERVAL,e -> {
@@ -113,21 +118,21 @@ public class GameEngine {
 
 
     //Update
-    public void update() {
+    public void update(double delta) {
         if(isPaused){
             lastPickUpTime = System.currentTimeMillis();
-            updateTurrets();
+            updateTurrets(delta);
             return ;
         }
         applyPhysics();
         checkPickUpCollisions();
         spawnPickUps();
         checkPowerUps();
-        updateTurrets();
+        updateTurrets(delta);
         CheckProjectileCollisions();
         randomizePlatforms();
         checkPlayerState();
-        player.update();
+        player.update(delta);
         updateIsHit();
 
         if(player.getPlayerHealth()<=0){
@@ -155,13 +160,13 @@ public class GameEngine {
     }
 
     // Moves the player to the left
-    public void moveLeft() {
-        player.moveLeft();
+    public void moveLeft(double delta) {
+        player.moveLeft(delta);
     }
 
     // Moves the player to the right
-    public void moveRight() {
-        player.moveRight();
+    public void moveRight(double delta) {
+        player.moveRight(delta);
     }
 
     // Handles game physics including gravity, platform collision, and boundaries
@@ -334,19 +339,21 @@ public class GameEngine {
         }
         if(player.getPlayerScore() >= GameConfig.POWER_UP_HEALTH_PICKUP_SCORE){
             canSpawnHealthApples=true;
+            setPowerUp("apple");
         }
         if(player.getPlayerScore() >= GameConfig.POWER_UP_SHIELD_PICKUP_SCORE){
             canSpawnShieldLeafs=true;
+            setPowerUp("leaf");
         }
     }
 
     // Updates turrets, including their projectile positions and firing intervals
-    private void updateTurrets(){
+    private void updateTurrets(double delta){
         for(Turret turret : turrets){
             if (isPaused){
                 turret.scheduleNextFire();
             }
-            turret.update(isPaused ? 0 : System.currentTimeMillis());
+            turret.update(isPaused ? 0 : System.currentTimeMillis(),delta);
         }
     }
 
@@ -374,6 +381,8 @@ public class GameEngine {
                 case "speed-boost": setMessage("SPEED BOOST !");break;
                 case "jump-boost": setMessage("JUMP BOOST !");break;
                 case "double-jump-boost": setMessage("YOU CAN DOUBLE JUMP !");break;
+                case "apple": setMessage("HEALTH APPLES MIGHT APPEAR !");break;
+                case "leaf": setMessage("SHIELD LEAFS MIGHT APPEAR !");break;
                 default:
             }
         }

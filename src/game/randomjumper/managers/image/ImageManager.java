@@ -19,6 +19,7 @@ public class ImageManager {
         preLoadImage("goldnut", "/images/pickups/gold nut.png" );
         preLoadImage("apple", "/images/pickups/apple.png" );
         preLoadImage("leaf", "/images/pickups/leaf.png" );
+        preLoadImage("shield", "/images/shield.png" );
 
         preLoadImage("platform" , "/images/platform.png" );
         preLoadImage("ground", "/images/ground.png" );
